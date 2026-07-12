@@ -1,0 +1,38 @@
+{
+  "name": "@turnkeeper/sdk",
+  "version": "0.0.0-development",
+  "private": true,
+  "description": "Server-side TypeScript client for Turnkeeper Replay.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "npm@11.6.2",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "package:check": "node scripts/check-package-contents.mjs",
+    "check": "npm run typecheck && npm run build && npm test && npm run package:check"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "22.19.9",
+    "tsx": "4.23.0",
+    "typescript": "5.7.3"
+  }
+}

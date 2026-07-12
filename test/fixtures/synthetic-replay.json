@@ -1,0 +1,50 @@
+{
+  "events": [
+    {
+      "api_version": "2026-07-09",
+      "source_event_id": "0000000000000000000000000000000000000000000000000000000000000001",
+      "type": "turn.started",
+      "occurred_at": "2026-07-12T11:59:59.000Z",
+      "conversation_external_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "turn_external_id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "turn_index": null,
+      "event_index": 0,
+      "parent_source_event_id": null,
+      "trace_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "data": {
+        "bot_type": "seller",
+        "channel": "simulator",
+        "decision_code": "workflow.start",
+        "provider": "anthropic",
+        "model": "model.preview",
+        "fallback": false,
+        "message_length": 42
+      },
+      "privacy": {
+        "mode": "metadata_only",
+        "key_version": 1
+      }
+    },
+    {
+      "api_version": "2026-07-09",
+      "source_event_id": "0000000000000000000000000000000000000000000000000000000000000002",
+      "type": "turn.completed",
+      "occurred_at": "2026-07-12T12:00:00.000Z",
+      "conversation_external_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "turn_external_id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "turn_index": null,
+      "event_index": 1,
+      "parent_source_event_id": "0000000000000000000000000000000000000000000000000000000000000001",
+      "trace_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "data": {
+        "outcome_code": "completed",
+        "delivery_state": "sent",
+        "attempt": 1
+      },
+      "privacy": {
+        "mode": "metadata_only",
+        "key_version": 1
+      }
+    }
+  ]
+}
