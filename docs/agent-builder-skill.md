@@ -62,7 +62,7 @@ handoff.
 
 ## Limitations
 
-The public packages are prerelease at `0.1.0-alpha.1`. The skill does not claim:
+The public packages are prerelease at `0.1.0-alpha.2`. The skill does not claim:
 
 - automatic execution or workflow resumption;
 - prompt-based authorization;

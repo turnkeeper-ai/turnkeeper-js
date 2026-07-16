@@ -160,7 +160,7 @@ export function createTransport(options: TurnkeeperTransportOptions): JsonTransp
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${apiKey}`,
-            "User-Agent": "turnkeeper-sdk/0.1.0-alpha.1",
+            "User-Agent": "turnkeeper-sdk/0.1.0-alpha.2",
             ...(requestOptions.body === undefined ? {} : { "Content-Type": "application/json" }),
             ...(requestOptions.idempotencyKey === undefined
               ? {}

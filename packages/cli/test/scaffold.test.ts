@@ -68,7 +68,7 @@ test("multi-action scaffolds use the exact SDK alpha and executable combined cas
     dependencies?: Record<string, string>;
     scripts?: Record<string, string>;
   };
-  assert.equal(manifest.dependencies?.["@turnkeeper/sdk"], "0.1.0-alpha.1");
+  assert.equal(manifest.dependencies?.["@turnkeeper/sdk"], "0.1.0-alpha.2");
   assert.equal(manifest.scripts?.typecheck, "tsc --noEmit");
   assert.equal(manifest.scripts?.check, "npm run typecheck && npm test");
   assert.ok(scaffold.files.some((file) => file.path === "tsconfig.json"));
@@ -169,7 +169,7 @@ test("write preflight prevents partial output and force performs a complete repl
     assert.match(await readFile(existingAgent, "utf8"), /availableActions/u);
     assert.equal(
       await readGeneratedPackageVersion(destination),
-      "0.1.0-alpha.1",
+      "0.1.0-alpha.2",
     );
   } finally {
     await rm(temporaryRoot, { force: true, recursive: true });
@@ -189,7 +189,7 @@ test("a missing destination is published by one directory rename", async () => {
     assert.equal(result.replacedFiles.length, 0);
     assert.equal(
       await readGeneratedPackageVersion(destination),
-      "0.1.0-alpha.1",
+      "0.1.0-alpha.2",
     );
     assert.match(
       await readFile(

@@ -65,6 +65,45 @@ test("validation errors do not echo unsafe values", () => {
   );
 });
 
+test("rejects PII, URLs, and credential-shaped values in every free code field", () => {
+  const fields = [
+    "stage_before",
+    "stage_after",
+    "decision_code",
+    "outcome_code",
+    "reason_code",
+    "reply_source",
+    "model",
+  ] as const;
+  const canaries = [
+    "555-123-4567",
+    "lead@example.com",
+    "123-Main-Street",
+    "https://example.com/private",
+    "sk_live_1234567890abcdef",
+    `sk-ant-api03-${"A".repeat(80)}`,
+    `sk-proj-${"A".repeat(80)}`,
+  ];
+
+  for (const field of fields) {
+    for (const canary of canaries) {
+      const event = replayEvent({ data: { ...replayEvent().data, [field]: canary } });
+      const result = validateReplayBatch({ events: [event] }, { now: NOW, retentionDays: 30 });
+      assert.equal(result.ok && result.events[0]?.ok, false, `${field} accepted an unsafe canary`);
+      assert.equal(JSON.stringify(result).includes(canary), false);
+    }
+  }
+
+  for (const canary of canaries) {
+    const event = replayEvent({
+      data: { ...replayEvent().data, extracted_field_names: [canary] },
+    });
+    const result = validateReplayBatch({ events: [event] }, { now: NOW, retentionDays: 30 });
+    assert.equal(result.ok && result.events[0]?.ok, false);
+    assert.equal(JSON.stringify(result).includes(canary), false);
+  }
+});
+
 test("enforces timestamp and identifier boundaries", () => {
   const invalidTimes = [
     "2026-07-12T12:05:00.001Z",

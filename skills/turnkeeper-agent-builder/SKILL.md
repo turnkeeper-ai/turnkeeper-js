@@ -11,7 +11,7 @@ Build against the public packages:
 - `@turnkeeper/cli` for deterministic scaffolding, validation, and generated policy cases.
 - `@turnkeeper/mcp` for development-time guidance and code-generation tools.
 
-Treat all `0.1.0-alpha.1` surfaces as prerelease. Do not claim that Turnkeeper executes customer
+Treat all `0.1.0-alpha.2` surfaces as prerelease. Do not claim that Turnkeeper executes customer
 actions, automatically resumes approved work, or replaces application authorization.
 
 ## Workflow
@@ -44,10 +44,10 @@ framework-specific placement. Read
 After the alpha packages are published:
 
 ```sh
-npx @turnkeeper/cli@0.1.0-alpha.1 init ./my-agent
-npx @turnkeeper/cli@0.1.0-alpha.1 validate ./my-agent/turnkeeper/policies.json
-npx @turnkeeper/cli@0.1.0-alpha.1 test-policies ./my-agent/turnkeeper/policies.json
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.1
+npx @turnkeeper/cli@0.1.0-alpha.2 init ./my-agent
+npx @turnkeeper/cli@0.1.0-alpha.2 validate ./my-agent/turnkeeper/policies.json
+npx @turnkeeper/cli@0.1.0-alpha.2 test-policies ./my-agent/turnkeeper/policies.json
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.2
 ```
 
 When working in this repository before publication, build and run the matching npm workspaces.
