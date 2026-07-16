@@ -1,9 +1,11 @@
 # Versioning
 
-The npm package will use semantic versioning when publication is approved. Replay uses a separate dated wire version.
+The public packages use semantic versioning. Replay uses a separate dated wire version.
 
 | SDK version | Replay API version | Status |
 |---|---|---|
-| 0.0.0-development | 2026-07-09 | private scaffold |
+| 0.1.0-alpha.1 | 2026-07-09 | public prerelease |
 
-Adding support for a new dated API version does not silently change existing event serialization. A future published package must document its compatibility and deprecation policy before changing the default contract.
+SDK, CLI, and MCP releases use the same version while their public contracts are evolving together.
+Pin exact alpha versions. Adding support for a new dated Replay API version does not silently
+change existing event serialization.

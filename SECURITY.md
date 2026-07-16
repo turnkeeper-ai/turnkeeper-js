@@ -1,11 +1,13 @@
 # Security policy
 
-## Supported versions
+Report suspected vulnerabilities privately to `support@turnkeeper.ai`. Do not include credentials,
+customer content, production identifiers, or exploit payloads in a public issue.
 
-The package is not published and currently has no supported release line.
+Supported releases are listed in GitHub Releases. Pre-release packages receive security fixes on a
+best-effort basis until the first stable release.
 
-## Reporting a vulnerability
+## Scope
 
-Use GitHub private vulnerability reporting when it is available, or email `alex@alexok.dev`. Do not open a public issue containing API keys, event payloads, customer identifiers, internal URLs, or exploit details.
-
-Rotate any credential that may have been exposed before sending a report. Reports should contain the smallest synthetic reproduction possible.
+This repository contains public clients and developer tooling. Reports about the hosted dashboard,
+organization management, cloud audit storage, billing, or production infrastructure should still
+be sent to the same private security contact and must not be disclosed through this repository.

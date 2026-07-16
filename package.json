@@ -1,35 +1,26 @@
 {
-  "name": "@turnkeeper/sdk",
-  "version": "0.0.0-development",
+  "name": "turnkeeper-sdk-monorepo",
+  "version": "0.1.0-alpha.1",
   "private": true,
-  "description": "Server-side TypeScript client for Turnkeeper Replay.",
-  "license": "UNLICENSED",
+  "description": "Public Turnkeeper SDK, CLI, MCP server, agent-builder skill, and examples.",
+  "license": "Apache-2.0",
   "type": "module",
-  "sideEffects": false,
-  "engines": {
-    "node": ">=22.0.0"
-  },
   "packageManager": "npm@11.6.2",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+  "engines": {
+    "node": ">=22.20.0 <23 || >=24.0.0 <25"
   },
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist",
-    "README.md",
-    "SECURITY.md"
+  "workspaces": [
+    "packages/*",
+    "examples/*"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --import tsx --test test/*.test.ts",
-    "package:check": "node scripts/check-package-contents.mjs",
-    "check": "npm run typecheck && npm run build && npm test && npm run package:check"
+    "build": "npm run build --workspace @turnkeeper/sdk && npm run build --workspaces --if-present",
+    "check": "npm run build && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present && npm run package:check --workspaces --if-present && npm run smoke:packages && node scripts/validate-skill.mjs",
+    "package:check": "npm run package:check --workspaces --if-present",
+    "smoke:packages": "node scripts/smoke-packages.mjs",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "22.19.9",
     "tsx": "4.23.0",

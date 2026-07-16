@@ -1,0 +1,57 @@
+{
+  "name": "@turnkeeper/sdk",
+  "version": "0.1.0-alpha.1",
+  "description": "Server-side TypeScript SDK for Turnkeeper Replay and bounded Control checks.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.20.0 <23 || >=24.0.0 <25"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/turnkeeper-ai/turnkeeper-js.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/turnkeeper-ai/turnkeeper-js/issues"
+  },
+  "homepage": "https://github.com/turnkeeper-ai/turnkeeper-js#readme",
+  "keywords": [
+    "ai-agents",
+    "audit",
+    "governance",
+    "human-in-the-loop",
+    "replay",
+    "turnkeeper"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "package:check": "node scripts/check-package-contents.mjs",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "zod": "4.4.3"
+  }
+}

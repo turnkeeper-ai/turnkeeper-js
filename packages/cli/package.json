@@ -1,0 +1,67 @@
+{
+  "name": "@turnkeeper/cli",
+  "version": "0.1.0-alpha.1",
+  "description": "Local CLI and scaffolding tools for bounded Turnkeeper agent integrations.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "packageManager": "npm@11.6.2",
+  "engines": {
+    "node": ">=22.20.0 <23 || >=24.0.0 <25"
+  },
+  "bin": {
+    "turnkeeper": "./dist/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "SECURITY.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/turnkeeper-ai/turnkeeper-js.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/turnkeeper-ai/turnkeeper-js/issues"
+  },
+  "homepage": "https://github.com/turnkeeper-ai/turnkeeper-js/tree/main/packages/cli#readme",
+  "keywords": [
+    "ai-agents",
+    "cli",
+    "governance",
+    "human-in-the-loop",
+    "turnkeeper"
+  ],
+  "scripts": {
+    "build": "node scripts/clean.mjs && tsc -p tsconfig.build.json",
+    "check": "npm run typecheck && npm test",
+    "package:check": "node scripts/check-package-contents.mjs",
+    "prepack": "npm run check",
+    "test": "npm run build && node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@turnkeeper/sdk": "0.1.0-alpha.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.9",
+    "tsx": "4.23.0",
+    "typescript": "5.7.3"
+  }
+}
