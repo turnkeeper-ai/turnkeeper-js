@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turnkeeper Agent Builder"
+  short_description: "Build governed agents with public Turnkeeper tools"
+  default_prompt: "Use $turnkeeper-agent-builder to add safe policy checks, review pauses, and metadata-only audit evidence to this AI agent."

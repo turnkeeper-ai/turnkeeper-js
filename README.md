@@ -1,75 +1,42 @@
-# Turnkeeper TypeScript SDK
+# Turnkeeper SDK
 
-This repository is a public pre-release, unpublished scaffold for a server-side Turnkeeper Replay client. The npm package is intentionally marked `private` and `UNLICENSED` while the public contract and release policy are reviewed.
+Public developer tooling for building governed AI-agent workflows with Turnkeeper.
 
-Current scope is limited to the preview, provider-specific Replay API contract `2026-07-09`:
+```text
+packages/sdk      Replay and bounded Control clients
+packages/cli      Scaffolding, policy validation, tests, and integration inspection
+packages/mcp      Development-time MCP tools
+skills/           Turnkeeper agent-builder skill
+examples/         Synthetic, runnable agent integrations
+docs/             Public integration and package documentation
+```
 
-- batch metadata event ingestion through `POST /api/v1/events/batch`
-- project-scoped metadata event reads through `GET /api/v1/events`
+The repository contains client libraries and developer tooling only. Hosted dashboards,
+organization management, approvals, audit storage, billing, and production API implementations
+remain in the private hosted-platform repository.
 
-Turnkeeper policy execution, model routing, prompts, memory, evaluations, handoffs, conversation orchestration, streaming, webhooks, and CLI commands are not part of this SDK.
+## Development
 
-## Requirements
-
-- Node.js 22 or newer
-- a server-side, project-bound Turnkeeper API key
-- a durable producer outbox for write retries
-
-Do not import this package into browser code. A bearer key grants access to a project and must stay in a server-side secret manager.
-
-## Local development
+Use Node.js 22.20 or Node.js 24.
 
 ```bash
 npm ci
 npm run check
 ```
 
-## Client
+The packages are pre-release software. Pin exact versions and review the documented safety
+boundaries before using them in a production workflow.
 
-```ts
-import {
-  REPLAY_API_VERSION,
-  TurnkeeperClient,
-  parseOpaqueReplayId,
-  type ReplayBatch,
-} from "@turnkeeper/sdk";
+## Packages
 
-const client = new TurnkeeperClient({
-  apiKey: process.env.TURNKEEPER_API_KEY!,
-  baseUrl: process.env.TURNKEEPER_BASE_URL!,
-});
+- [`@turnkeeper/sdk`](packages/sdk/README.md)
+- [`@turnkeeper/cli`](packages/cli/README.md)
+- [`@turnkeeper/mcp`](packages/mcp/README.md)
 
-const batch: ReplayBatch = {
-  events: [
-    {
-      api_version: REPLAY_API_VERSION,
-      source_event_id: parseOpaqueReplayId("1".repeat(64)),
-      type: "turn.started",
-      occurred_at: new Date().toISOString(),
-      conversation_external_id: parseOpaqueReplayId("a".repeat(64)),
-      turn_external_id: parseOpaqueReplayId("b".repeat(64)),
-      event_index: 0,
-      data: { channel: "webhook" },
-      privacy: { mode: "metadata_only", key_version: 1 },
-    },
-  ],
-};
+See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
+[agent-builder skill](docs/agent-builder-skill.md).
 
-// Call this from a background worker after claiming a durable outbox row.
-const write = await client.replay.ingestBatch(batch);
+## Security
 
-const page = await client.replay.listEvents({
-  conversationExternalId: batch.events[0].conversation_external_id,
-  limit: 50,
-});
-```
-
-The client never retries automatically. Use `classifyRetry` to decide whether a durable outbox row should be retried, quarantined, or marked sent.
-
-## Safety boundaries
-
-Replay is metadata-only. Never send message text, prompts, completions, summaries, transcripts, names, emails, phone numbers, addresses, raw customer identifiers, provider payloads, extracted values, tool arguments/results, credentials, headers, or arbitrary metadata.
-
-Use full-length, environment-specific HMAC-SHA-256 pseudonyms for predictable source identifiers. This SDK validates opaque identifiers but deliberately does not define how application identities are composed.
-
-See [Replay usage](docs/replay.md), [privacy](docs/privacy.md), [retry behavior](docs/retries.md), and [versioning](docs/versioning.md).
+Keep Turnkeeper credentials server-side. Replay accepts metadata only, and a model-generated tool
+call is a proposal—not authorization to execute a real-world action. See [SECURITY.md](SECURITY.md).
