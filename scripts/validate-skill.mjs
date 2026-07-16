@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 
 const root = process.cwd();
-const version = "0.1.0-alpha.1";
+const version = "0.1.0-alpha.2";
 const packageDirectories = ["packages/sdk", "packages/cli", "packages/mcp"];
 const requiredPaths = [
   "LICENSE",

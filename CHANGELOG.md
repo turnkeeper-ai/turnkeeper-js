@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Reject Anthropic- and OpenAI-shaped credential values in every Replay free-code field.
 - Convert the repository into the public Turnkeeper SDK monorepo.
 - Add Apache-2.0 licensing and publishable `0.1.0-alpha.1` package metadata.
 - Add strict Replay validation, server compatibility exports, safe transport errors, and retry

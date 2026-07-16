@@ -198,6 +198,7 @@ function looksUnsafe(value: string): boolean {
     return true;
   }
   if (/^(?:sk|pk|rk|tk)_(?:live|test)_[A-Za-z0-9_-]{8,}$/i.test(text)) return true;
+  if (/^sk-(?:ant-api\d+|proj)-[A-Za-z0-9_-]{16,}$/i.test(text)) return true;
   if (/^(?:ghp_|github_pat_|xox[baprs]-)[A-Za-z0-9_-]{8,}$/i.test(text)) return true;
   if (/^AKIA[A-Z0-9]{16}$/.test(text)) return true;
   if (/^AIza[A-Za-z0-9_-]{20,}$/.test(text)) return true;

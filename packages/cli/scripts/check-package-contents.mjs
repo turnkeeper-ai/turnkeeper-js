@@ -7,14 +7,14 @@ const manifest = JSON.parse(
 );
 if (
   manifest.name !== "@turnkeeper/cli" ||
-  manifest.version !== "0.1.0-alpha.1"
+  manifest.version !== "0.1.0-alpha.2"
 ) {
   throw new Error("CLI package identity is not release-aligned.");
 }
 if (manifest.license !== "Apache-2.0" || manifest.private === true) {
   throw new Error("CLI package must remain public and Apache-2.0 licensed.");
 }
-if (manifest.dependencies?.["@turnkeeper/sdk"] !== "0.1.0-alpha.1") {
+if (manifest.dependencies?.["@turnkeeper/sdk"] !== "0.1.0-alpha.2") {
   throw new Error(
     "CLI package must use the exact release-aligned SDK dependency.",
   );

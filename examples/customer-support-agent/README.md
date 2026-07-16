@@ -29,6 +29,6 @@ parameters to Replay. The example identifiers are synthetic.
 Development tooling after the alpha packages are published:
 
 ```sh
-npx @turnkeeper/cli@0.1.0-alpha.1 inspect .
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.1
+npx @turnkeeper/cli@0.1.0-alpha.2 inspect .
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.2
 ```

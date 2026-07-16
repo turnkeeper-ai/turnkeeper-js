@@ -4,14 +4,14 @@
 tools. It exposes deterministic Turnkeeper integration guidance without executing production
 actions.
 
-The package is prerelease at `0.1.0-alpha.1`.
+The package is prerelease at `0.1.0-alpha.2`.
 
 ## Start the server
 
 After the alpha package is published:
 
 ```sh
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.1
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.2
 ```
 
 Example MCP host configuration:
@@ -21,7 +21,7 @@ Example MCP host configuration:
   "mcpServers": {
     "turnkeeper": {
       "command": "npx",
-      "args": ["-y", "@turnkeeper/mcp@0.1.0-alpha.1"],
+      "args": ["-y", "@turnkeeper/mcp@0.1.0-alpha.2"],
       "env": {
         "TURNKEEPER_WORKSPACE_ROOT": "/absolute/path/to/your/project"
       }
