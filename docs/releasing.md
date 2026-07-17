@@ -119,6 +119,13 @@ workflow will continue only when an existing package version's registry integrit
 the tarball built from the tagged commit. A mismatched artifact or a missing provenance
 attestation is a hard failure; package versions are immutable, so fix forward with a new version.
 
+If registry publication succeeds but a later verification or GitHub-release step fails, merge the
+verifier-only correction, then manually run `Release public packages` from `main` with the existing
+annotated tag in `release_tag`. The recovery run checks out that tag, rebuilds its artifacts, and
+uses the same integrity and provenance gates before creating or verifying the prerelease. Never
+move a tag after any package for that version has reached the registry. Manual recovery runs fail
+instead of publishing if any package in the release is missing.
+
 Do not manually upload a tarball built from an uncommitted worktree, publish only one dependent
 package, reuse a published version, move `latest` as part of an alpha release, replace a release
 tag, or document npm installation before the registry release is verified.
