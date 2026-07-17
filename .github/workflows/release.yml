@@ -166,26 +166,44 @@ jobs:
             local artifact="$2"
             local package_spec="${package_name}@${version}"
             local observed_integrity
+            local publish_status
+            test -f "${artifact}"
             observed_integrity="$(registry_integrity "${package_spec}")"
 
             if [[ -n "${observed_integrity}" && "${observed_integrity}" != "undefined" ]]; then
               echo "${package_spec} already exists; verifying the previously published artifact."
             else
-              if ! npm publish "${artifact}" \
+              if npm publish "${artifact}" \
                 --access public \
                 --tag next \
                 --provenance \
                 --registry="${registry}"; then
-                echo "Publish returned an error; checking for a completed registry write before failing."
+                wait_for_registry "${package_name}" "${artifact}"
+                return
+              else
+                publish_status=$?
+                echo "Publish returned an error; briefly checking for a completed registry write."
+                for attempt in $(seq 1 6); do
+                  observed_integrity="$(registry_integrity "${package_spec}")"
+                  if [[ -n "${observed_integrity}" && "${observed_integrity}" != "undefined" ]]; then
+                    wait_for_registry "${package_name}" "${artifact}"
+                    return
+                  fi
+                  if [[ "${attempt}" -lt 6 ]]; then
+                    sleep 10
+                  fi
+                done
+                echo "Publish failed and ${package_spec} did not appear in the registry." >&2
+                return "${publish_status}"
               fi
             fi
 
             wait_for_registry "${package_name}" "${artifact}"
           }
 
-          publish_or_verify "@turnkeeper/sdk" "release-artifacts/turnkeeper-sdk-${version}.tgz"
-          publish_or_verify "@turnkeeper/cli" "release-artifacts/turnkeeper-cli-${version}.tgz"
-          publish_or_verify "@turnkeeper/mcp" "release-artifacts/turnkeeper-mcp-${version}.tgz"
+          publish_or_verify "@turnkeeper/sdk" "./release-artifacts/turnkeeper-sdk-${version}.tgz"
+          publish_or_verify "@turnkeeper/cli" "./release-artifacts/turnkeeper-cli-${version}.tgz"
+          publish_or_verify "@turnkeeper/mcp" "./release-artifacts/turnkeeper-mcp-${version}.tgz"
 
       - name: Verify clean registry consumers and provenance
         shell: bash
