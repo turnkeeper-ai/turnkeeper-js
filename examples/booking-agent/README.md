@@ -25,6 +25,6 @@ Record the provider result locally and enqueue metadata-only Replay evidence aft
 Development tooling after the alpha packages are published:
 
 ```sh
-npx @turnkeeper/cli@0.1.0-alpha.2 inspect .
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.2
+npx @turnkeeper/cli@0.1.0-alpha.3 inspect .
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.3
 ```

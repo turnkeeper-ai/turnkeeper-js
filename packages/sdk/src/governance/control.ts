@@ -20,6 +20,8 @@ const REVIEW_ID_PATTERN = /^rev_[A-Za-z0-9_-]{1,96}$/u;
 const CODE_PATTERN = /^[a-z0-9][a-z0-9_.:/-]{0,119}$/u;
 const HEX_64_PATTERN = /^[a-f0-9]{64}$/u;
 
+export const CONTROL_API_VERSION = "2026-07-16" as const;
+
 export interface ControlClientOptions {
   readonly apiKey: string;
   readonly baseUrl: string;
@@ -58,12 +60,16 @@ export interface ControlCheckResult {
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
-  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+  if (value === null || typeof value !== "object" || Array.isArray(value))
+    return false;
   const prototype = Object.getPrototypeOf(value);
   return prototype === Object.prototype || prototype === null;
 }
 
-function exactKeys(value: Record<string, unknown>, allowed: ReadonlySet<string>): boolean {
+function exactKeys(
+  value: Record<string, unknown>,
+  allowed: ReadonlySet<string>,
+): boolean {
   return Object.keys(value).every((key) => allowed.has(key));
 }
 
@@ -99,7 +105,9 @@ function parsePolicySummary(value: unknown): HostedPolicySummary | null {
     typeof value.name !== "string" ||
     value.name.length > 120 ||
     !safeString(value.rule_code, CODE_PATTERN) ||
-    !Number.isSafeInteger(value.version)
+    !Number.isSafeInteger(value.version) ||
+    Number(value.version) < 1 ||
+    Number(value.version) > 2_147_483_647
   ) {
     return null;
   }
@@ -165,10 +173,14 @@ function parseResponse(
     value.decision !== "review" &&
     value.decision !== "block"
   ) {
-    throw new TurnkeeperProtocolError("invalid_control_decision", { requestId });
+    throw new TurnkeeperProtocolError("invalid_control_decision", {
+      requestId,
+    });
   }
   if (value.decision !== expectedDecision) {
-    throw new TurnkeeperProtocolError("policy_configuration_mismatch", { requestId });
+    throw new TurnkeeperProtocolError("policy_configuration_mismatch", {
+      requestId,
+    });
   }
   const hostedPolicy = parsePolicySummary(value.policy);
   if (!hostedPolicy) {
@@ -189,21 +201,35 @@ function parseResponse(
     hostedPolicy.condition.type !== expectedCondition.type ||
     hostedPolicy.condition.value !== expectedCondition.value
   ) {
-    throw new TurnkeeperProtocolError("policy_configuration_mismatch", { requestId });
+    throw new TurnkeeperProtocolError("policy_configuration_mismatch", {
+      requestId,
+    });
   }
 
   const evidenceValue = value.evidence;
   if (
     !isPlainObject(evidenceValue) ||
-    !exactKeys(evidenceValue, new Set(["record_hash", "record_id", "request_hash"]))
+    !exactKeys(
+      evidenceValue,
+      new Set(["record_hash", "record_id", "request_hash"]),
+    )
   ) {
-    throw new TurnkeeperProtocolError("invalid_control_evidence", { requestId });
+    throw new TurnkeeperProtocolError("invalid_control_evidence", {
+      requestId,
+    });
   }
   const recordHash = safeString(evidenceValue.record_hash, HEX_64_PATTERN);
   const recordId = safeString(evidenceValue.record_id, RECORD_ID_PATTERN);
   const requestHash = safeString(evidenceValue.request_hash, HEX_64_PATTERN);
-  if (!recordHash || !recordId || !requestHash || requestHash !== expectedRequestHash) {
-    throw new TurnkeeperProtocolError("control_request_hash_mismatch", { requestId });
+  if (
+    !recordHash ||
+    !recordId ||
+    !requestHash ||
+    requestHash !== expectedRequestHash
+  ) {
+    throw new TurnkeeperProtocolError("control_request_hash_mismatch", {
+      requestId,
+    });
   }
 
   let review: ControlReview | null = null;
@@ -212,16 +238,28 @@ function parseResponse(
       !isPlainObject(value.review) ||
       !exactKeys(value.review, new Set(["id", "status", "version"]))
     ) {
-      throw new TurnkeeperProtocolError("missing_control_review", { requestId });
+      throw new TurnkeeperProtocolError("missing_control_review", {
+        requestId,
+      });
     }
     const id = safeString(value.review.id, REVIEW_ID_PATTERN);
     const status = safeString(value.review.status, CODE_PATTERN);
-    if (!id || !status || !Number.isSafeInteger(value.review.version) || Number(value.review.version) < 1) {
-      throw new TurnkeeperProtocolError("invalid_control_review", { requestId });
+    if (
+      !id ||
+      !status ||
+      !Number.isSafeInteger(value.review.version) ||
+      Number(value.review.version) < 1 ||
+      Number(value.review.version) > 2_147_483_647
+    ) {
+      throw new TurnkeeperProtocolError("invalid_control_review", {
+        requestId,
+      });
     }
     review = { id, status, version: Number(value.review.version) };
   } else if (value.review !== null) {
-    throw new TurnkeeperProtocolError("unexpected_control_review", { requestId });
+    throw new TurnkeeperProtocolError("unexpected_control_review", {
+      requestId,
+    });
   }
 
   return {
@@ -252,7 +290,9 @@ export class ControlClient {
       throw new TurnkeeperProtocolError("invalid_local_policy_bundle");
     }
     const bundle = PolicyBundleSchema.parse(bundleValue);
-    const local = simulateAction(bundle, action, { bindingSecret: options.bindingSecret });
+    const local = simulateAction(bundle, action, {
+      bindingSecret: options.bindingSecret,
+    });
     const idempotencyKey = deriveIdempotencyKey(local.actionBinding);
 
     if (local.decision === "block") {

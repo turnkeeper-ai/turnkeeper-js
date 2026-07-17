@@ -1,5 +1,5 @@
 * @owwix
 
 /spec/ @owwix
-/src/replay/ @owwix
+/packages/sdk/src/replay/ @owwix
 /.github/workflows/ @owwix

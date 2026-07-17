@@ -298,6 +298,7 @@ function looksUnsafeMetadataString(value: string): boolean {
     return true;
   }
   if (/^(?:sk|pk|rk|tk)_(?:live|test)_[A-Za-z0-9_-]{8,}$/iu.test(text)) return true;
+  if (/^sk-(?:ant-api\d+|proj)-[A-Za-z0-9_-]{16,}$/iu.test(text)) return true;
   if (/^(?:ghp_|github_pat_|xox[baprs]-)[A-Za-z0-9_-]{8,}$/iu.test(text)) return true;
   if (/^AKIA[A-Z0-9]{16}$/u.test(text)) return true;
   if (/^AIza[A-Za-z0-9_-]{20,}$/u.test(text)) return true;

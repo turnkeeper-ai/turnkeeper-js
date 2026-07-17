@@ -208,6 +208,64 @@ test("ControlClient accepts only a correlated, matched decision equal to local p
   assert.equal(result.review?.id, "rev_synthetic");
 });
 
+test("ControlClient rejects hosted policy and review versions outside the wire contract", async () => {
+  const expectedRequest = {
+    references: { action_id: createActionBinding(action(), BINDING_SECRET) },
+    signals: action().signals,
+    workflow: action().actionName,
+  };
+
+  for (const [field, code] of [
+    ["policy", "invalid_control_policy"],
+    ["review", "invalid_control_review"],
+  ] as const) {
+    for (const version of [0, 2_147_483_648]) {
+      const response = {
+        request_id: "req_synthetic",
+        check_id: "chk_synthetic",
+        decision: "review",
+        evidence: {
+          record_hash: "b".repeat(64),
+          record_id: "grc_synthetic",
+          request_hash: canonicalSHA256(expectedRequest),
+        },
+        matched: true,
+        policy: {
+          id: "pol_synthetic",
+          name: "issue_refund review_required",
+          condition: { key: "amount", operator: "gte", type: "number", value: "100" },
+          rule_code: "issue_refund.review_required",
+          version: field === "policy" ? version : 1,
+        },
+        reason_code: "issue_refund.review_required",
+        review: {
+          id: "rev_synthetic",
+          status: "open",
+          version: field === "review" ? version : 1,
+        },
+      };
+      const client = new ControlClient({
+        apiKey: API_KEY,
+        baseUrl: "https://api.example.invalid",
+        fetch: async () =>
+          new Response(JSON.stringify(response), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+      });
+
+      await assert.rejects(
+        () => client.check(bundle(), action(), { bindingSecret: BINDING_SECRET }),
+        (error: unknown) => {
+          assert.ok(error instanceof TurnkeeperProtocolError);
+          assert.equal(error.code, code);
+          return true;
+        },
+      );
+    }
+  }
+});
+
 test("ControlClient rejects unmatched allows and local/hosted policy drift", async () => {
   for (const response of [
     {

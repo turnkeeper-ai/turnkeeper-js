@@ -4,6 +4,17 @@
 the decision and may create a human review, but it never executes the customer action or resumes a
 workflow.
 
+The dated request and response contracts are published under
+`spec/control-check-request-2026-07-16.schema.json` and
+`spec/control-check-response-2026-07-16.schema.json`. The SDK exports the matching
+`CONTROL_API_VERSION`.
+
+The hosted response is either a matched policy decision or a fail-closed
+`block` with `matched: false`, `policy: null`, and
+`reason_code: "no_policy_match"`. `ControlClient` normally resolves that case
+locally through the required fallback policy and keeps stricter hosted-policy
+correlation for requests that reach the server.
+
 ## Required sequence
 
 1. Parse the model output as an untrusted proposal.
