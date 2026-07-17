@@ -3,13 +3,18 @@ import path from "node:path";
 import process from "node:process";
 
 const root = process.cwd();
-const version = "0.1.0-alpha.2";
+const version = "0.1.0-alpha.3";
 const packageDirectories = ["packages/sdk", "packages/cli", "packages/mcp"];
 const requiredPaths = [
   "LICENSE",
+  "docs/control.md",
   "docs/mcp.md",
   "docs/agent-builder-skill.md",
+  "docs/releasing.md",
   "docs/repository-boundary.md",
+  "spec/control-check-request-2026-07-16.schema.json",
+  "spec/control-check-response-2026-07-16.schema.json",
+  "spec/replay-2026-07-09.schema.json",
   "skills/turnkeeper-agent-builder/SKILL.md",
   "skills/turnkeeper-agent-builder/agents/openai.yaml",
   "skills/turnkeeper-agent-builder/references/public-packages.md",
@@ -35,7 +40,8 @@ async function text(file) {
 for (const file of requiredPaths) await text(file);
 
 const skill = await text("skills/turnkeeper-agent-builder/SKILL.md");
-if (!skill.startsWith("---\n")) throw new Error("Skill frontmatter is missing.");
+if (!skill.startsWith("---\n"))
+  throw new Error("Skill frontmatter is missing.");
 const frontmatterEnd = skill.indexOf("\n---\n", 4);
 if (frontmatterEnd < 0) throw new Error("Skill frontmatter is not closed.");
 const frontmatter = skill.slice(4, frontmatterEnd);
@@ -44,13 +50,17 @@ if (!/^name: turnkeeper-agent-builder$/mu.test(frontmatter)) {
 }
 const description = /^description: (.+)$/mu.exec(frontmatter)?.[1];
 if (!description || description.length < 40 || description.length > 1_024) {
-  throw new Error("Skill description is missing or outside the supported length.");
+  throw new Error(
+    "Skill description is missing or outside the supported length.",
+  );
 }
 
 for (const directory of packageDirectories) {
   const manifest = JSON.parse(await text(`${directory}/package.json`));
   if (manifest.version !== version) {
-    throw new Error(`${manifest.name} must use synchronized version ${version}.`);
+    throw new Error(
+      `${manifest.name} must use synchronized version ${version}.`,
+    );
   }
   if (manifest.license !== "Apache-2.0" || manifest.private === true) {
     throw new Error(`${manifest.name} must be a public Apache-2.0 package.`);
@@ -80,25 +90,52 @@ if (
   throw new Error("Replay schema and SDK version drifted.");
 }
 
+const controlRequestSchema = JSON.parse(
+  await text("spec/control-check-request-2026-07-16.schema.json"),
+);
+const controlResponseSchema = JSON.parse(
+  await text("spec/control-check-response-2026-07-16.schema.json"),
+);
+const controlSource = await text("packages/sdk/src/governance/control.ts");
+const controlVersion = /\/(\d{4}-\d{2}-\d{2})\.json$/u.exec(
+  String(controlRequestSchema.$id),
+)?.[1];
+if (
+  !controlVersion ||
+  !String(controlResponseSchema.$id).endsWith(`/${controlVersion}.json`) ||
+  !controlSource.includes(`CONTROL_API_VERSION = "${controlVersion}"`)
+) {
+  throw new Error("Control schemas and SDK version drifted.");
+}
+
 async function sourceFiles(directory) {
   const result = [];
-  for (const entry of await readdir(path.join(root, directory), { withFileTypes: true })) {
+  for (const entry of await readdir(path.join(root, directory), {
+    withFileTypes: true,
+  })) {
     if ([".git", "dist", "node_modules"].includes(entry.name)) continue;
     const relative = path.join(directory, entry.name);
     if (entry.isDirectory()) result.push(...(await sourceFiles(relative)));
-    else if (/\.(?:json|md|mjs|ts|yaml)$/u.test(entry.name)) result.push(relative);
+    else if (/\.(?:json|md|mjs|ts|yaml)$/u.test(entry.name))
+      result.push(relative);
   }
   return result;
 }
 
 for (const file of await sourceFiles(".")) {
-  if (file === "package-lock.json" || file === "scripts/validate-skill.mjs") continue;
+  if (file === "package-lock.json" || file === "scripts/validate-skill.mjs")
+    continue;
   const content = await text(file);
   const prohibited = prohibitedText.find((value) => content.includes(value));
-  if (prohibited) throw new Error(`Prohibited private-repository reference in ${file}: ${prohibited}`);
+  if (prohibited)
+    throw new Error(
+      `Prohibited private-repository reference in ${file}: ${prohibited}`,
+    );
   if (/\btk_(?:live|test)_[A-Za-z0-9_-]{32,96}\b/u.test(content)) {
     throw new Error(`Credential-like value found in ${file}.`);
   }
 }
 
-console.log("Skill, package versions, Replay contract, and repository boundary verified.");
+console.log(
+  "Skill, package versions, Replay/Control contracts, and repository boundary verified.",
+);

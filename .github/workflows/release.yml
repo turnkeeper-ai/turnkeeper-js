@@ -1,0 +1,282 @@
+name: Release public packages
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: public-package-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    if: github.repository == 'turnkeeper-ai/turnkeeper-js'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: npm-release
+    steps:
+      - name: Check out the release commit
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.18.0
+
+      - name: Use the repository npm version
+        run: |
+          npm install --global npm@11.6.2
+          test "$(node --version)" = "v24.18.0"
+          test "$(npm --version)" = "11.6.2"
+
+      - name: Verify the release tag and manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --force origin \
+            "+refs/heads/main:refs/remotes/origin/main" \
+            "+refs/tags/*:refs/tags/*"
+
+          tag_ref="refs/tags/${GITHUB_REF_NAME}"
+          test "$(git cat-file -t "${tag_ref}")" = "tag"
+          tagged_commit="$(git rev-list -n 1 "${tag_ref}")"
+          test "${tagged_commit}" = "$(git rev-parse "${GITHUB_SHA}^{commit}")"
+          test "${tagged_commit}" = "$(git rev-parse HEAD)"
+          git merge-base --is-ancestor "${tagged_commit}" origin/main
+
+          node --input-type=module <<'NODE'
+          import assert from "node:assert/strict";
+          import { readFileSync } from "node:fs";
+
+          const readManifest = (path) => JSON.parse(readFileSync(path, "utf8"));
+          const root = readManifest("package.json");
+          const sdk = readManifest("packages/sdk/package.json");
+          const cli = readManifest("packages/cli/package.json");
+          const mcp = readManifest("packages/mcp/package.json");
+          const version = root.version;
+
+          assert.match(version, /^\d+\.\d+\.\d+-[0-9A-Za-z.-]+$/u, "release must be a prerelease");
+          assert.equal(process.env.GITHUB_REF_NAME, `v${version}`, "tag must match the root version");
+          assert.equal(root.packageManager, "npm@11.6.2", "unexpected package manager");
+          assert.equal(sdk.version, version, "SDK version is not aligned");
+          assert.equal(cli.version, version, "CLI version is not aligned");
+          assert.equal(mcp.version, version, "MCP version is not aligned");
+          assert.equal(cli.dependencies?.["@turnkeeper/sdk"], version, "CLI must pin this SDK version");
+          assert.equal(mcp.dependencies?.["@turnkeeper/sdk"], version, "MCP must pin this SDK version");
+          assert.equal(mcp.dependencies?.["@turnkeeper/cli"], version, "MCP must pin this CLI version");
+          NODE
+
+      - name: Install and verify the release commit
+        run: |
+          npm ci
+          npm run check
+
+      - name: Pack release artifacts once
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          rm -rf release-artifacts
+          mkdir -p release-artifacts
+
+          npm pack --workspace @turnkeeper/sdk --ignore-scripts --pack-destination release-artifacts
+          npm pack --workspace @turnkeeper/cli --ignore-scripts --pack-destination release-artifacts
+          npm pack --workspace @turnkeeper/mcp --ignore-scripts --pack-destination release-artifacts
+
+          npm sbom --workspace @turnkeeper/sdk --sbom-format cyclonedx > release-artifacts/turnkeeper-sdk.cdx.json
+          npm sbom --workspace @turnkeeper/cli --sbom-format cyclonedx > release-artifacts/turnkeeper-cli.cdx.json
+          npm sbom --workspace @turnkeeper/mcp --sbom-format cyclonedx > release-artifacts/turnkeeper-mcp.cdx.json
+          cp spec/replay-2026-07-09.schema.json release-artifacts/
+          cp spec/control-check-request-2026-07-16.schema.json release-artifacts/
+          cp spec/control-check-response-2026-07-16.schema.json release-artifacts/
+
+          for artifact in \
+            "release-artifacts/turnkeeper-sdk-${version}.tgz" \
+            "release-artifacts/turnkeeper-cli-${version}.tgz" \
+            "release-artifacts/turnkeeper-mcp-${version}.tgz" \
+            "release-artifacts/replay-2026-07-09.schema.json" \
+            "release-artifacts/control-check-request-2026-07-16.schema.json" \
+            "release-artifacts/control-check-response-2026-07-16.schema.json"; do
+            test -f "${artifact}"
+          done
+
+          (
+            cd release-artifacts
+            sha256sum ./*.tgz ./*.json | sort -k 2 > SHA256SUMS
+          )
+
+      - name: Publish the packed artifacts with provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          registry="https://registry.npmjs.org"
+
+          local_integrity() {
+            node -e 'const { createHash } = require("node:crypto"); const { readFileSync } = require("node:fs"); process.stdout.write(`sha512-${createHash("sha512").update(readFileSync(process.argv[1])).digest("base64")}`)' "$1"
+          }
+
+          registry_integrity() {
+            npm view "$1" dist.integrity --registry="${registry}" 2>/dev/null || true
+          }
+
+          wait_for_registry() {
+            local package_name="$1"
+            local artifact="$2"
+            local package_spec="${package_name}@${version}"
+            local expected_integrity
+            local observed_integrity
+            local observed_provenance
+            expected_integrity="$(local_integrity "${artifact}")"
+
+            for attempt in $(seq 1 90); do
+              observed_integrity="$(registry_integrity "${package_spec}")"
+              if [[ -n "${observed_integrity}" && "${observed_integrity}" != "undefined" ]]; then
+                if [[ "${observed_integrity}" != "${expected_integrity}" ]]; then
+                  echo "Registry integrity mismatch for ${package_spec}" >&2
+                  return 1
+                fi
+                test "$(npm view "${package_spec}" version --registry="${registry}")" = "${version}"
+                observed_provenance="$(npm view "${package_spec}" dist.attestations.provenance.predicateType --registry="${registry}" 2>/dev/null || true)"
+                if [[ "${observed_provenance}" = "https://slsa.dev/provenance/v1" ]]; then
+                  echo "Verified ${package_spec} after ${attempt} registry check(s)."
+                  return 0
+                fi
+              fi
+
+              if [[ "${attempt}" -lt 90 ]]; then
+                sleep 10
+              fi
+            done
+
+            echo "Timed out waiting 15 minutes for ${package_spec}." >&2
+            return 1
+          }
+
+          publish_or_verify() {
+            local package_name="$1"
+            local artifact="$2"
+            local package_spec="${package_name}@${version}"
+            local observed_integrity
+            observed_integrity="$(registry_integrity "${package_spec}")"
+
+            if [[ -n "${observed_integrity}" && "${observed_integrity}" != "undefined" ]]; then
+              echo "${package_spec} already exists; verifying the previously published artifact."
+            else
+              if ! npm publish "${artifact}" \
+                --access public \
+                --tag next \
+                --provenance \
+                --registry="${registry}"; then
+                echo "Publish returned an error; checking for a completed registry write before failing."
+              fi
+            fi
+
+            wait_for_registry "${package_name}" "${artifact}"
+          }
+
+          publish_or_verify "@turnkeeper/sdk" "release-artifacts/turnkeeper-sdk-${version}.tgz"
+          publish_or_verify "@turnkeeper/cli" "release-artifacts/turnkeeper-cli-${version}.tgz"
+          publish_or_verify "@turnkeeper/mcp" "release-artifacts/turnkeeper-mcp-${version}.tgz"
+
+      - name: Verify clean registry consumers and provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          registry="https://registry.npmjs.org"
+          consumer="$(mktemp -d)"
+          trap 'rm -rf "${consumer}"' EXIT
+
+          printf '{"name":"turnkeeper-release-verification","private":true,"type":"module"}\n' > "${consumer}/package.json"
+          npm install \
+            --ignore-scripts \
+            --save-exact \
+            --registry="${registry}" \
+            --prefix "${consumer}" \
+            "@turnkeeper/sdk@${version}" \
+            "@turnkeeper/cli@${version}" \
+            "@turnkeeper/mcp@${version}"
+
+          (
+            cd "${consumer}"
+            node --input-type=module -e 'const sdk = await import("@turnkeeper/sdk"); if (Object.keys(sdk).length === 0) throw new Error("SDK exports are empty");'
+            ./node_modules/.bin/turnkeeper --help
+
+            set +e
+            TURNKEEPER_WORKSPACE_ROOT="${consumer}" timeout 10s ./node_modules/.bin/turnkeeper-mcp 2>mcp.stderr
+            mcp_status=$?
+            set -e
+            if [[ "${mcp_status}" -ne 0 && "${mcp_status}" -ne 124 ]]; then
+              cat mcp.stderr >&2
+              exit "${mcp_status}"
+            fi
+            grep -q "Turnkeeper MCP server running on stdio." mcp.stderr
+
+            npm audit signatures --json --include-attestations > audit-signatures.json
+          )
+
+          AUDIT_FILE="${consumer}/audit-signatures.json" RELEASE_VERSION="${version}" node --input-type=module <<'NODE'
+          import assert from "node:assert/strict";
+          import { readFileSync } from "node:fs";
+
+          const audit = JSON.parse(readFileSync(process.env.AUDIT_FILE, "utf8"));
+          assert.deepEqual(audit.invalid ?? [], [], "npm reported invalid signatures");
+          assert.deepEqual(audit.missing ?? [], [], "npm reported missing signatures");
+
+          for (const name of ["@turnkeeper/sdk", "@turnkeeper/cli", "@turnkeeper/mcp"]) {
+            const verified = (audit.verified ?? []).find(
+              (entry) => entry.name === name && entry.version === process.env.RELEASE_VERSION,
+            );
+            assert.ok(verified, `npm did not verify ${name}`);
+            assert.equal(
+              verified.attestations?.provenance?.predicateType,
+              "https://slsa.dev/provenance/v1",
+              `${name} is missing SLSA provenance`,
+            );
+          }
+          NODE
+
+          for package_name in @turnkeeper/sdk @turnkeeper/cli @turnkeeper/mcp; do
+            test "$(npm view "${package_name}" dist-tags.next --registry="${registry}")" = "${version}"
+            test "$(npm view "${package_name}@${version}" dist.attestations.provenance.predicateType --registry="${registry}")" = "https://slsa.dev/provenance/v1"
+          done
+
+      - name: Create the GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            test "$(gh release view "${GITHUB_REF_NAME}" --json isPrerelease --jq .isPrerelease)" = "true"
+            test "$(gh release view "${GITHUB_REF_NAME}" --json isDraft --jq .isDraft)" = "false"
+            download_dir="$(mktemp -d)"
+            trap 'rm -rf "${download_dir}"' EXIT
+            gh release download "${GITHUB_REF_NAME}" --dir "${download_dir}"
+            diff -u \
+              <(find release-artifacts -maxdepth 1 -type f -printf '%f\n' | sort) \
+              <(find "${download_dir}" -maxdepth 1 -type f -printf '%f\n' | sort)
+            for artifact in release-artifacts/*; do
+              cmp --silent "${artifact}" "${download_dir}/$(basename "${artifact}")"
+            done
+            echo "Verified the existing immutable GitHub prerelease."
+            exit 0
+          fi
+
+          gh release create "${GITHUB_REF_NAME}" \
+            release-artifacts/* \
+            --generate-notes \
+            --latest=false \
+            --prerelease \
+            --title "${GITHUB_REF_NAME}" \
+            --verify-tag

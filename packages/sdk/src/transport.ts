@@ -11,7 +11,10 @@ const REQUEST_ID_RE = /^req_[A-Za-z0-9_-]{1,96}$/;
 const MAX_RESPONSE_BYTES = 4 * 1024 * 1024;
 const DEFAULT_TIMEOUT_MS = 10_000;
 
-export type TurnkeeperFetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
+export type TurnkeeperFetch = (
+  input: string | URL | Request,
+  init?: RequestInit,
+) => Promise<Response>;
 
 export interface TurnkeeperTransportOptions {
   readonly apiKey: string;
@@ -42,18 +45,30 @@ function normalizeBaseUrl(value: string): string {
   } catch {
     return validation("invalid_base_url");
   }
-  if (url.username || url.password || url.search || url.hash) return validation("invalid_base_url");
-  if (url.pathname !== "/" && url.pathname !== "") return validation("invalid_base_url");
-  const local = url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "[::1]" || url.hostname === "::1";
-  if (url.protocol !== "https:" && !(local && url.protocol === "http:")) return validation("insecure_base_url");
+  if (url.username || url.password || url.search || url.hash)
+    return validation("invalid_base_url");
+  if (url.pathname !== "/" && url.pathname !== "")
+    return validation("invalid_base_url");
+  const local =
+    url.hostname === "localhost" ||
+    url.hostname === "127.0.0.1" ||
+    url.hostname === "[::1]" ||
+    url.hostname === "::1";
+  if (url.protocol !== "https:" && !(local && url.protocol === "http:"))
+    return validation("insecure_base_url");
   return url.origin;
 }
 
 function safeRequestId(value: unknown): string | undefined {
-  return typeof value === "string" && REQUEST_ID_RE.test(value) ? value : undefined;
+  return typeof value === "string" && REQUEST_ID_RE.test(value)
+    ? value
+    : undefined;
 }
 
-function retryAfterMs(value: string | null, now = Date.now()): number | undefined {
+function retryAfterMs(
+  value: string | null,
+  now = Date.now(),
+): number | undefined {
   if (value === null) return undefined;
   if (/^\d+$/.test(value)) return Math.min(Number(value) * 1000, 86_400_000);
   const date = Date.parse(value);
@@ -66,12 +81,19 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 function apiError(response: Response, value: unknown): TurnkeeperApiError {
-  const bodyRequestId = isObject(value) ? safeRequestId(value.request_id) : undefined;
-  const requestId = safeRequestId(response.headers.get("x-request-id")) ?? bodyRequestId;
-  const errorObject = isObject(value) && isObject(value.error) ? value.error : null;
-  const code = errorObject && typeof errorObject.code === "string" && SAFE_ERROR_CODE_RE.test(errorObject.code)
-    ? errorObject.code
-    : "http_error";
+  const bodyRequestId = isObject(value)
+    ? safeRequestId(value.request_id)
+    : undefined;
+  const requestId =
+    safeRequestId(response.headers.get("x-request-id")) ?? bodyRequestId;
+  const errorObject =
+    isObject(value) && isObject(value.error) ? value.error : null;
+  const code =
+    errorObject &&
+    typeof errorObject.code === "string" &&
+    SAFE_ERROR_CODE_RE.test(errorObject.code)
+      ? errorObject.code
+      : "http_error";
   const retryDelay = retryAfterMs(response.headers.get("retry-after"));
   return new TurnkeeperApiError({
     code,
@@ -83,12 +105,20 @@ function apiError(response: Response, value: unknown): TurnkeeperApiError {
 
 async function boundedJson(response: Response): Promise<unknown> {
   const declared = response.headers.get("content-length");
-  if (declared && /^\d+$/.test(declared) && Number(declared) > MAX_RESPONSE_BYTES) {
-    throw new TurnkeeperProtocolError("response_too_large", { status: response.status });
+  if (
+    declared &&
+    /^\d+$/.test(declared) &&
+    Number(declared) > MAX_RESPONSE_BYTES
+  ) {
+    throw new TurnkeeperProtocolError("response_too_large", {
+      status: response.status,
+    });
   }
   if (!response.body) {
     if (!response.ok) return null;
-    throw new TurnkeeperProtocolError("invalid_json_response", { status: response.status });
+    throw new TurnkeeperProtocolError("invalid_json_response", {
+      status: response.status,
+    });
   }
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -100,13 +130,17 @@ async function boundedJson(response: Response): Promise<unknown> {
       byteCount += value.byteLength;
       if (byteCount > MAX_RESPONSE_BYTES) {
         await reader.cancel().catch(() => undefined);
-        throw new TurnkeeperProtocolError("response_too_large", { status: response.status });
+        throw new TurnkeeperProtocolError("response_too_large", {
+          status: response.status,
+        });
       }
       chunks.push(value);
     }
   } catch (error) {
     if (error instanceof TurnkeeperProtocolError) throw error;
-    throw new TurnkeeperProtocolError("response_read_failed", { status: response.status });
+    throw new TurnkeeperProtocolError("response_read_failed", {
+      status: response.status,
+    });
   }
   const bytes = new Uint8Array(byteCount);
   let offset = 0;
@@ -118,21 +152,28 @@ async function boundedJson(response: Response): Promise<unknown> {
   try {
     text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   } catch {
-    throw new TurnkeeperProtocolError("invalid_json_response", { status: response.status });
+    throw new TurnkeeperProtocolError("invalid_json_response", {
+      status: response.status,
+    });
   }
   try {
     return JSON.parse(text) as unknown;
   } catch {
     if (!response.ok) return null;
-    throw new TurnkeeperProtocolError("invalid_json_response", { status: response.status });
+    throw new TurnkeeperProtocolError("invalid_json_response", {
+      status: response.status,
+    });
   }
 }
 
-export function createTransport(options: TurnkeeperTransportOptions): JsonTransport {
+export function createTransport(
+  options: TurnkeeperTransportOptions,
+): JsonTransport {
   if (!API_KEY_RE.test(options.apiKey)) return validation("invalid_api_key");
   const baseUrl = normalizeBaseUrl(options.baseUrl);
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 120_000) return validation("invalid_timeout");
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 120_000)
+    return validation("invalid_timeout");
   const fetchImpl = options.fetch ?? globalThis.fetch;
   if (typeof fetchImpl !== "function") return validation("fetch_unavailable");
   const apiKey = options.apiKey;
@@ -160,17 +201,23 @@ export function createTransport(options: TurnkeeperTransportOptions): JsonTransp
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${apiKey}`,
-            "User-Agent": "turnkeeper-sdk/0.1.0-alpha.2",
-            ...(requestOptions.body === undefined ? {} : { "Content-Type": "application/json" }),
+            "User-Agent": "turnkeeper-sdk/0.1.0-alpha.3",
+            ...(requestOptions.body === undefined
+              ? {}
+              : { "Content-Type": "application/json" }),
             ...(requestOptions.idempotencyKey === undefined
               ? {}
               : { "Idempotency-Key": requestOptions.idempotencyKey }),
           },
-          ...(requestOptions.body === undefined ? {} : { body: requestOptions.body }),
+          ...(requestOptions.body === undefined
+            ? {}
+            : { body: requestOptions.body }),
         });
       } catch {
         if (controller.signal.aborted) {
-          throw new TurnkeeperTransportError(callerAborted ? "request_aborted" : "request_timeout");
+          throw new TurnkeeperTransportError(
+            callerAborted ? "request_aborted" : "request_timeout",
+          );
         }
         throw new TurnkeeperTransportError("network_error");
       } finally {
@@ -178,8 +225,13 @@ export function createTransport(options: TurnkeeperTransportOptions): JsonTransp
         requestOptions.signal?.removeEventListener("abort", onAbort);
       }
 
-      if (response.redirected || (response.status >= 300 && response.status < 400)) {
-        throw new TurnkeeperProtocolError("redirect_not_allowed", { status: response.status });
+      if (
+        response.redirected ||
+        (response.status >= 300 && response.status < 400)
+      ) {
+        throw new TurnkeeperProtocolError("redirect_not_allowed", {
+          status: response.status,
+        });
       }
       const value = await boundedJson(response);
       if (!response.ok) throw apiError(response, value);

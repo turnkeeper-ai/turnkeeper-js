@@ -2,22 +2,31 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import process from "node:process";
 
-const manifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
-if (manifest.name !== "@turnkeeper/mcp" || manifest.version !== "0.1.0-alpha.2") {
+const manifest = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+);
+if (
+  manifest.name !== "@turnkeeper/mcp" ||
+  manifest.version !== "0.1.0-alpha.3"
+) {
   throw new Error("MCP package identity is not release-aligned.");
 }
 if (manifest.license !== "Apache-2.0" || manifest.private === true) {
   throw new Error("MCP package must remain public and Apache-2.0 licensed.");
 }
 if (
-  manifest.dependencies?.["@turnkeeper/sdk"] !== "0.1.0-alpha.2" ||
-  manifest.dependencies?.["@turnkeeper/cli"] !== "0.1.0-alpha.2"
+  manifest.dependencies?.["@turnkeeper/sdk"] !== "0.1.0-alpha.3" ||
+  manifest.dependencies?.["@turnkeeper/cli"] !== "0.1.0-alpha.3"
 ) {
-  throw new Error("MCP package must use exact release-aligned Turnkeeper dependencies.");
+  throw new Error(
+    "MCP package must use exact release-aligned Turnkeeper dependencies.",
+  );
 }
 for (const lifecycle of ["install", "postinstall", "preinstall"]) {
   if (manifest.scripts?.[lifecycle]) {
-    throw new Error(`MCP package must not declare a ${lifecycle} lifecycle script.`);
+    throw new Error(
+      `MCP package must not declare a ${lifecycle} lifecycle script.`,
+    );
   }
 }
 
@@ -39,7 +48,10 @@ try {
 } catch {
   throw new Error("npm pack returned an unreadable report.");
 }
-const files = report[0]?.files?.map((entry) => String(entry.path).replace(/^package\//u, "")) ?? [];
+const files =
+  report[0]?.files?.map((entry) =>
+    String(entry.path).replace(/^package\//u, ""),
+  ) ?? [];
 const required = [
   "LICENSE",
   "README.md",
@@ -50,7 +62,8 @@ const required = [
   "package.json",
 ];
 for (const file of required) {
-  if (!files.includes(file)) throw new Error(`Required package file is missing: ${file}`);
+  if (!files.includes(file))
+    throw new Error(`Required package file is missing: ${file}`);
 }
 const unexpected = files.filter(
   (file) =>

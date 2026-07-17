@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://turnkeeper.ai/schemas/control/check-request/2026-07-16.json",
+  "title": "Turnkeeper Control check request 2026-07-16",
+  "description": "Bounded metadata-only Control check request.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["workflow", "signals", "references"],
+  "properties": {
+    "workflow": {
+      "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/code"
+    },
+    "signals": {
+      "type": "object",
+      "maxProperties": 16,
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 64,
+        "pattern": "^[a-z][a-z0-9_.-]{0,63}$",
+        "not": {
+          "pattern": "(?:^|[._-])(?:address|api_?key|auth|birth|completion|content|credential|email|message|name|password|phone|prompt|secret|ssn|text|token|transcript|uri|url)(?:$|[._-])"
+        }
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/signalCode"
+          },
+          {
+            "type": "number",
+            "minimum": -1000000000000,
+            "maximum": 1000000000000
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      }
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_id"],
+      "properties": {
+        "action_id": {
+          "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/opaqueId"
+        },
+        "conversation_external_id": {
+          "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/opaqueId"
+        },
+        "turn_external_id": {
+          "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/opaqueId"
+        },
+        "source_event_id": {
+          "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/opaqueId"
+        },
+        "trace_id": {
+          "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/opaqueId"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "signalCode": {
+      "allOf": [
+        {
+          "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/code"
+        },
+        {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_.:/-]{0,119}$"
+        },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9+.-]{1,31}:"
+          }
+        }
+      ]
+    }
+  }
+}

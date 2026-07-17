@@ -23,7 +23,7 @@ import {
   type WorkspaceBoundaryCode,
 } from "./workspace.js";
 
-const VERSION = "0.1.0-alpha.2";
+const VERSION = "0.1.0-alpha.3";
 
 const AgentTypeSchema = z.enum([
   "anthropic-compatible",
@@ -37,7 +37,10 @@ const ProjectPathSchema = z
   .string()
   .min(1)
   .max(1024)
-  .refine((value) => !value.includes("\0") && !value.startsWith("/"), "invalid_project_path");
+  .refine(
+    (value) => !value.includes("\0") && !value.startsWith("/"),
+    "invalid_project_path",
+  );
 const JsonObjectSchema = z.record(z.string(), z.json());
 
 const QuickstartInputSchema = z
@@ -50,7 +53,11 @@ const ScaffoldInputSchema = z
     agentType: AgentTypeSchema,
     framework: FrameworkSchema,
     language: LanguageSchema,
-    projectName: z.string().min(2).max(64).regex(/^[a-z0-9][a-z0-9-]{1,63}$/u),
+    projectName: z
+      .string()
+      .min(2)
+      .max(64)
+      .regex(/^[a-z0-9][a-z0-9-]{1,63}$/u),
   })
   .strict();
 const GeneratePolicySchema = GeneratePolicyInputSchema;
@@ -62,9 +69,15 @@ const SimulateActionWireSchema = z
 const SimulateActionSchema = z
   .object({ action: ActionContextSchema, bundle: PolicyBundleSchema })
   .strict();
-const GeneratePolicyTestsWireSchema = z.object({ bundle: z.unknown() }).strict();
-const GeneratePolicyTestsSchema = z.object({ bundle: PolicyBundleSchema }).strict();
-const InspectIntegrationSchema = z.object({ projectPath: ProjectPathSchema }).strict();
+const GeneratePolicyTestsWireSchema = z
+  .object({ bundle: z.unknown() })
+  .strict();
+const GeneratePolicyTestsSchema = z
+  .object({ bundle: PolicyBundleSchema })
+  .strict();
+const InspectIntegrationSchema = z
+  .object({ projectPath: ProjectPathSchema })
+  .strict();
 const MigrationHelpSchema = z
   .object({ language: LanguageSchema, riskLevel: RiskLevelSchema })
   .strict();
@@ -78,7 +91,9 @@ type ToolResponse = {
 function success(output: unknown): ToolResponse {
   const structuredContent = { result: output };
   return {
-    content: [{ text: serializeBoundedOutput(structuredContent), type: "text" }],
+    content: [
+      { text: serializeBoundedOutput(structuredContent), type: "text" },
+    ],
     structuredContent,
   };
 }
@@ -86,14 +101,19 @@ function success(output: unknown): ToolResponse {
 function failure(code: string): ToolResponse {
   const structuredContent = { error: { code }, ok: false };
   return {
-    content: [{ text: serializeBoundedOutput(structuredContent), type: "text" }],
+    content: [
+      { text: serializeBoundedOutput(structuredContent), type: "text" },
+    ],
     isError: true,
     structuredContent,
   };
 }
 
 function safeErrorCode(error: unknown): string {
-  if (error instanceof PayloadBoundaryError || error instanceof WorkspaceBoundaryError) {
+  if (
+    error instanceof PayloadBoundaryError ||
+    error instanceof WorkspaceBoundaryError
+  ) {
     return error.code;
   }
   if (
@@ -124,7 +144,10 @@ function boundedHandler<Input>(
   };
 }
 
-function registerTools(server: McpServer, handlers: DevelopmentToolHandlers): void {
+function registerTools(
+  server: McpServer,
+  handlers: DevelopmentToolHandlers,
+): void {
   server.registerTool(
     "get_turnkeeper_quickstart",
     {
@@ -164,7 +187,8 @@ function registerTools(server: McpServer, handlers: DevelopmentToolHandlers): vo
   server.registerTool(
     "validate_policy",
     {
-      description: "Validate one bounded policy bundle without calling Turnkeeper.",
+      description:
+        "Validate one bounded policy bundle without calling Turnkeeper.",
       inputSchema: ValidatePolicyWireSchema.shape,
     },
     boundedHandler(ValidatePolicySchema, handlers.validate_policy),
@@ -211,7 +235,9 @@ export interface McpServerOptions {
   workspaceRoot: string;
 }
 
-export async function createMcpServer(options: McpServerOptions): Promise<McpServer> {
+export async function createMcpServer(
+  options: McpServerOptions,
+): Promise<McpServer> {
   const workspaceRoot = await resolveWorkspaceRoot(options.workspaceRoot);
   const server = new McpServer({ name: "turnkeeper", version: VERSION });
   registerTools(server, createDevelopmentToolHandlers(workspaceRoot));

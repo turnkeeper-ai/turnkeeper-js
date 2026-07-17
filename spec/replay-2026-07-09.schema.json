@@ -25,7 +25,49 @@
     "code": {
       "type": "string",
       "maxLength": 120,
-      "pattern": "^[A-Za-z0-9_.:/-]{1,120}$"
+      "pattern": "^[A-Za-z0-9_.:/-]{1,120}$",
+      "allOf": [
+        {
+          "not": {
+            "pattern": "(?:[Hh][Tt][Tt][Pp][Ss]?://|[Ww][Ww][Ww]\\.|[A-Za-z0-9-]+\\.(?:com|net|org|io|ai|dev|app)(?:[/?#:]|$))"
+          }
+        },
+        {
+          "not": {
+            "pattern": "(?:\\+?1[-.]?)?\\(?[0-9]{3}\\)?[-.][0-9]{3}[-.][0-9]{4}"
+          }
+        },
+        {
+          "not": {
+            "pattern": "[0-9]{1,6}[._/:_-]+(?:[A-Za-z0-9]+[._/:_-]+){0,4}(?:[Ss][Tt](?:reet)?|[Rr][Dd](?:oad)?|[Aa][Vv][Ee](?:nue)?|[Bb][Ll][Vv][Dd]|[Ll][Nn]|[Dd][Rr](?:ive)?|[Cc][Tt]|[Hh][Ww][Yy]|[Ww][Aa][Yy])(?:[._/:_-]|$)"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^(?:[Ss][Kk]|[Pp][Kk]|[Rr][Kk]|[Tt][Kk])_(?:[Ll][Ii][Vv][Ee]|[Tt][Ee][Ss][Tt])_[A-Za-z0-9_-]{8,}$"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^[Ss][Kk]-(?:[Aa][Nn][Tt]-[Aa][Pp][Ii][0-9]+|[Pp][Rr][Oo][Jj])-[A-Za-z0-9_-]{16,}$"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^(?:ghp_|github_pat_|xox[baprs]-)[A-Za-z0-9_-]{8,}$"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^(?:AKIA[A-Z0-9]{16}|AIza[A-Za-z0-9_-]{20,}|eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+)$"
+          }
+        },
+        {
+          "not": {
+            "pattern": "(?:[Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]|[Pp][Aa][Ss][Ss][Ww][Dd]|[Ss][Ee][Cc][Rr][Ee][Tt]|[Aa][Pp][Ii][-_]?[Kk][Ee][Yy]|[Aa][Cc][Cc][Ee][Ss][Ss][-_]?[Tt][Oo][Kk][Ee][Nn]|[Aa][Uu][Tt][Hh][-_]?[Tt][Oo][Kk][Ee][Nn])[:=_-][A-Za-z0-9._/-]{8,}"
+          }
+        }
+      ]
     },
     "nullableCode": {
       "oneOf": [{ "$ref": "#/$defs/code" }, { "type": "null" }]
@@ -39,8 +81,14 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "bot_type": { "type": ["string", "null"], "enum": ["seller", "buyer", null] },
-        "channel": { "type": ["string", "null"], "enum": ["sms", "webhook", "simulator", null] },
+        "bot_type": {
+          "type": ["string", "null"],
+          "enum": ["seller", "buyer", null]
+        },
+        "channel": {
+          "type": ["string", "null"],
+          "enum": ["sms", "webhook", "simulator", null]
+        },
         "stage_before": { "$ref": "#/$defs/nullableCode" },
         "stage_after": { "$ref": "#/$defs/nullableCode" },
         "decision_code": { "$ref": "#/$defs/nullableCode" },
@@ -49,7 +97,11 @@
         "reply_source": { "$ref": "#/$defs/nullableCode" },
         "extracted_field_names": {
           "oneOf": [
-            { "type": "array", "maxItems": 32, "items": { "$ref": "#/$defs/code" } },
+            {
+              "type": "array",
+              "maxItems": 32,
+              "items": { "$ref": "#/$defs/code" }
+            },
             { "type": "null" }
           ]
         },
@@ -59,11 +111,22 @@
         "output_tokens": { "$ref": "#/$defs/nullableCount" },
         "cache_read_tokens": { "$ref": "#/$defs/nullableCount" },
         "cache_write_tokens": { "$ref": "#/$defs/nullableCount" },
-        "latency_ms": { "type": ["integer", "null"], "minimum": 0, "maximum": 86400000 },
+        "latency_ms": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 86400000
+        },
         "fallback": { "type": ["boolean", "null"] },
-        "message_length": { "type": ["integer", "null"], "minimum": 0, "maximum": 1048576 },
+        "message_length": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 1048576
+        },
         "message_fingerprint": { "$ref": "#/$defs/nullableOpaqueId" },
-        "delivery_state": { "type": ["string", "null"], "enum": ["queued", "held", "sent", "failed", "none", null] },
+        "delivery_state": {
+          "type": ["string", "null"],
+          "enum": ["queued", "held", "sent", "failed", "none", null]
+        },
         "attempt": { "$ref": "#/$defs/nullableCount" }
       }
     },
@@ -73,7 +136,11 @@
       "required": ["mode", "key_version"],
       "properties": {
         "mode": { "const": "metadata_only" },
-        "key_version": { "type": "integer", "minimum": 1, "maximum": 2147483647 }
+        "key_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        }
       }
     },
     "event": {
@@ -108,11 +175,22 @@
             "turn.failed"
           ]
         },
-        "occurred_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$" },
+        "occurred_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?(?:Z|[+-]\\d{2}:\\d{2})$"
+        },
         "conversation_external_id": { "$ref": "#/$defs/opaqueId" },
         "turn_external_id": { "$ref": "#/$defs/opaqueId" },
-        "turn_index": { "type": ["integer", "null"], "minimum": 0, "maximum": 2147483647 },
-        "event_index": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+        "turn_index": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "event_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
         "parent_source_event_id": { "$ref": "#/$defs/nullableOpaqueId" },
         "trace_id": { "$ref": "#/$defs/nullableOpaqueId" },
         "data": { "$ref": "#/$defs/data" },

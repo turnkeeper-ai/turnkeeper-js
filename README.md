@@ -34,7 +34,8 @@ boundaries before using them in a production workflow.
 - [`@turnkeeper/mcp`](packages/mcp/README.md)
 
 See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
-[agent-builder skill](docs/agent-builder-skill.md).
+[agent-builder skill](docs/agent-builder-skill.md). Maintainers should use the
+[public package release process](docs/releasing.md).
 
 ## Security
 
