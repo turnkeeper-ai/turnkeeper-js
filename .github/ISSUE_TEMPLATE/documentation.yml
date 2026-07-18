@@ -1,0 +1,63 @@
+name: Documentation or example improvement
+description: Propose a bounded improvement to public docs or synthetic examples.
+title: "docs: "
+labels:
+  - documentation
+body:
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - Repository onboarding
+        - SDK
+        - CLI
+        - MCP
+        - Agent-builder skill
+        - Replay
+        - Control
+        - Privacy or security
+        - Example application
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: Current location
+      placeholder: "Link or repository path"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Reader problem
+      description: Explain what a reader cannot understand or complete today.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the verifiable reader outcome without promising unshipped behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: State what should remain unchanged or out of scope.
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to open a pull request after maintainers confirm the scope.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: The proposal uses synthetic examples and does not include private or unshipped Turnkeeper behavior.
+          required: true

@@ -1,0 +1,73 @@
+name: Feature proposal
+description: Propose a new or changed public SDK, CLI, MCP, skill, example, or documentation surface.
+title: "proposal: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not implement a new public surface until a maintainer accepts its scope and compatibility direction. Private hosted-product plans are not contribution targets.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Proposed surface
+      options:
+        - SDK
+        - CLI
+        - MCP
+        - Agent-builder skill
+        - Example
+        - Specification or documentation
+        - Contributor tooling
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Describe current evidence and who experiences the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Proposed outcome
+      description: Describe behavior and ergonomics rather than prescribing an implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility and safety boundaries
+      description: Address API versioning, metadata-only Replay, fail-closed Control, secret safety, and package boundaries where relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Acceptance evidence
+      description: Explain how maintainers and users would verify the outcome.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: This proposal does not depend on private strategy or claim unshipped hosted behavior.
+          required: true
+        - label: I will wait for maintainer scope approval before opening an implementation pull request.
+          required: true

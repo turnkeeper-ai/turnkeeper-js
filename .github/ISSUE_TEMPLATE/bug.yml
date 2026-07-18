@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible defect in public Turnkeeper developer tooling.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include credentials, customer content, production identifiers, private endpoints, or exploit payloads. Report security concerns privately using the link on the issue chooser.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - SDK
+        - CLI
+        - MCP
+        - Agent-builder skill
+        - Example
+        - Documentation
+        - Release tooling
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Exact version or commit
+      placeholder: "@turnkeeper/sdk 0.1.0-alpha.3 or commit SHA"
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem
+      description: Describe the observable defect using synthetic data.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide the smallest safe sequence that reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Node.js, npm, operating system, framework, and MCP client when relevant"
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed credentials, customer content, production identifiers, private endpoints, and private company material.
+          required: true
+        - label: This is not a vulnerability report or sensitive security disclosure.
+          required: true
