@@ -44,6 +44,7 @@ complete. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request,
 forms for bugs, documentation improvements, and feature proposals.
 
 - [Contribution workflow](CONTRIBUTING.md)
+- [Contributor architecture map](docs/contributor-architecture.md)
 - [Public roadmap](ROADMAP.md)
 - [Support](SUPPORT.md)
 - [Governance](GOVERNANCE.md)

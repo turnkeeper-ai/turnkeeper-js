@@ -23,14 +23,38 @@ deployment configuration, billing, cloud persistence, and private strategy are o
 Technical decisions should be recorded in the issue or pull request that owns the outcome. Large
 proposals should be split until each pull request can be reviewed and reverted independently.
 
+## Triage and response targets
+
+During the alpha period, maintainers target:
+
+- initial triage of a new public issue within five business days
+- an initial response to a review-ready pull request within five business days
+- a public status update when accepted work is paused for more than ten business days
+
+These are response targets, not resolution or release SLAs. Security reports follow the private
+process in [SECURITY.md](SECURITY.md) and must not be filed publicly.
+
+An issue labeled `good first issue` or `help wanted` with complete acceptance criteria is ready for
+external work. A feature proposal is accepted only when a maintainer explicitly confirms its public
+scope and compatibility direction. A milestone or assignment alone does not accept a proposal.
+
+Maintainers may close stale requests for missing reproduction details or mark work paused when
+review capacity is unavailable. The reason and the condition for reconsideration should be recorded
+publicly when privacy and security allow.
+
 ## Review and merge
 
 Every external pull request requires passing checks and at least one maintainer approval. Authors
 must resolve review conversations before merge. Maintainers own release timing, compatibility
 classification, security response, and final merge decisions.
 
+Maintainer-authored release or repository-administration pull requests may use the administrator
+bypass when no independent maintainer is available. Required status checks, linear history,
+conversation resolution, and release verification still apply. External contributions never bypass
+maintainer review.
+
 Maintainers should explain rejected or deferred proposals in public when privacy and security allow.
-There is no guaranteed review or release SLA during the alpha period.
+There is no guaranteed resolution or release SLA during the alpha period.
 
 ## Maintainers
 

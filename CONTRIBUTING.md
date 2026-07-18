@@ -10,6 +10,10 @@ Start with the [public roadmap](ROADMAP.md) and an open issue with complete acce
 Issues labeled `good first issue` are bounded for new contributors. Issues labeled `help wanted`
 are ready for external implementation but may require more repository context.
 
+Read the [contributor architecture map](docs/contributor-architecture.md) before changing more than
+one package or public contract. It identifies dependency direction, contract ownership, tests, and
+the files that must stay synchronized.
+
 - Use the bug form for reproducible defects.
 - Use the documentation form for docs and example gaps.
 - Open a feature proposal before implementing a new public command, tool, export, or contract.
@@ -56,6 +60,11 @@ Pull requests should:
 
 Maintainers may ask for a design issue before reviewing code that expands a public surface. See
 [GOVERNANCE.md](GOVERNANCE.md) for decision and review ownership.
+
+Maintainers target initial issue triage and an initial response to review-ready pull requests within
+five business days during the alpha period. This is a response target, not a resolution or release
+SLA. The governance document explains how ready work, paused work, and accepted proposals are
+identified.
 
 ## Contract changes
 
