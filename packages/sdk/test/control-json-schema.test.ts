@@ -4,7 +4,11 @@ import test from "node:test";
 
 import { Ajv2020 } from "ajv/dist/2020.js";
 
-import { CONTROL_API_VERSION, SignalValueSchema } from "../src/index.js";
+import {
+  CONTROL_API_VERSION,
+  CONTROL_REVIEW_API_VERSION,
+  SignalValueSchema,
+} from "../src/index.js";
 
 function schema(name: string) {
   return JSON.parse(
@@ -19,6 +23,9 @@ const validateRequest = ajv.compile(
 );
 const validateResponse = ajv.compile(
   schema("control-check-response-2026-07-16.schema.json"),
+);
+const validateReviewResponse = ajv.compile(
+  schema("control-review-response-2026-07-16.schema.json"),
 );
 
 const validRequest = {
@@ -66,8 +73,38 @@ const validUnmatchedBlock = {
   review: null,
 };
 
+const validReviewResponse = {
+  api_version: CONTROL_REVIEW_API_VERSION,
+  request_id: "req_synthetic",
+  review: {
+    action_ref: "action_binding_1",
+    conversation_external_id: "a".repeat(64),
+    id: "rev_synthetic",
+    policy: {
+      id: "pol_synthetic",
+      name: "Review larger refunds",
+      rule_code: "issue_refund.review",
+      version: 1,
+    },
+    priority: 80,
+    requested_at: "2026-07-18T10:00:00.000Z",
+    resolution: {
+      decided_at: "2026-07-18T10:05:00.000Z",
+      outcome_code: "approved_exact_proposal",
+      reason_code: "human_review_complete",
+    },
+    source_event_id: null,
+    status: "approved",
+    trace_id: null,
+    turn_external_id: "b".repeat(64),
+    version: 2,
+    workflow: "issue_refund",
+  },
+};
+
 test("exports the dated Control contract and validates bounded request/response fixtures", () => {
   assert.equal(CONTROL_API_VERSION, "2026-07-16");
+  assert.equal(CONTROL_REVIEW_API_VERSION, "2026-07-16");
   assert.equal(
     validateRequest(validRequest),
     true,
@@ -90,6 +127,28 @@ test("exports the dated Control contract and validates bounded request/response 
     }),
     true,
     JSON.stringify(validateResponse.errors),
+  );
+  assert.equal(
+    validateReviewResponse(validReviewResponse),
+    true,
+    JSON.stringify(validateReviewResponse.errors),
+  );
+});
+
+test("Control review schema binds terminal status to a bounded resolution", () => {
+  assert.equal(
+    validateReviewResponse({
+      ...validReviewResponse,
+      review: { ...validReviewResponse.review, resolution: null },
+    }),
+    false,
+  );
+  assert.equal(
+    validateReviewResponse({
+      ...validReviewResponse,
+      review: { ...validReviewResponse.review, unexpected: true },
+    }),
+    false,
   );
 });
 

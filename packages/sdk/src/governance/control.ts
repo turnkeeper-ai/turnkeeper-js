@@ -1,6 +1,6 @@
 import { canonicalSHA256 } from "../replay/validation.js";
 import { createTransport, type TurnkeeperFetch } from "../transport.js";
-import { TurnkeeperProtocolError } from "../errors.js";
+import { TurnkeeperProtocolError, TurnkeeperValidationError } from "../errors.js";
 import {
   PolicyBundleSchema,
   createActionBinding,
@@ -21,6 +21,7 @@ const CODE_PATTERN = /^[a-z0-9][a-z0-9_.:/-]{0,119}$/u;
 const HEX_64_PATTERN = /^[a-f0-9]{64}$/u;
 
 export const CONTROL_API_VERSION = "2026-07-16" as const;
+export const CONTROL_REVIEW_API_VERSION = "2026-07-16" as const;
 
 export interface ControlClientOptions {
   readonly apiKey: string;
@@ -44,6 +45,37 @@ export interface ControlReview {
   readonly id: string;
   readonly status: string;
   readonly version: number;
+}
+
+export interface ControlReviewGetOptions {
+  readonly signal?: AbortSignal;
+}
+
+export interface ControlReviewPolicy {
+  readonly id: string;
+  readonly name: string;
+  readonly ruleCode: string;
+  readonly version: number;
+}
+
+export interface ControlReviewResolution {
+  readonly decidedAt: string;
+  readonly outcomeCode: string;
+  readonly reasonCode: string;
+}
+
+export interface ControlReviewRecord extends ControlReview {
+  readonly actionRef: string | null;
+  readonly conversationExternalId: string | null;
+  readonly policy: ControlReviewPolicy | null;
+  readonly priority: number;
+  readonly requestedAt: string;
+  readonly requestId: string;
+  readonly resolution: ControlReviewResolution | null;
+  readonly sourceEventId: string | null;
+  readonly traceId: string | null;
+  readonly turnExternalId: string | null;
+  readonly workflow: string;
 }
 
 export interface ControlCheckResult {
@@ -133,6 +165,151 @@ function parsePolicySummary(value: unknown): HostedPolicySummary | null {
     name: value.name,
     ruleCode: String(value.rule_code),
     version: Number(value.version),
+  };
+}
+
+function safeTimestamp(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) && new Date(parsed).toISOString() === value ? value : null;
+}
+
+function nullablePatternString(value: unknown, pattern: RegExp): string | null | undefined {
+  if (value === null) return null;
+  return safeString(value, pattern) ?? undefined;
+}
+
+function parseReviewResponse(value: unknown): ControlReviewRecord {
+  if (
+    !isPlainObject(value) ||
+    !exactKeys(value, new Set(["api_version", "request_id", "review"])) ||
+    value.api_version !== CONTROL_REVIEW_API_VERSION
+  ) {
+    throw new TurnkeeperProtocolError("invalid_control_review_response");
+  }
+  const requestId = safeString(value.request_id, REQUEST_ID_PATTERN);
+  const review = value.review;
+  if (
+    !requestId ||
+    !isPlainObject(review) ||
+    !exactKeys(
+      review,
+      new Set([
+        "action_ref",
+        "conversation_external_id",
+        "id",
+        "policy",
+        "priority",
+        "requested_at",
+        "resolution",
+        "source_event_id",
+        "status",
+        "trace_id",
+        "turn_external_id",
+        "version",
+        "workflow",
+      ]),
+    )
+  ) {
+    throw new TurnkeeperProtocolError(
+      "invalid_control_review_response",
+      requestId === null ? {} : { requestId },
+    );
+  }
+
+  const id = safeString(review.id, REVIEW_ID_PATTERN);
+  const actionRef = nullablePatternString(review.action_ref, CODE_PATTERN);
+  const conversationExternalId = nullablePatternString(review.conversation_external_id, HEX_64_PATTERN);
+  const sourceEventId = nullablePatternString(review.source_event_id, HEX_64_PATTERN);
+  const traceId = nullablePatternString(review.trace_id, HEX_64_PATTERN);
+  const turnExternalId = nullablePatternString(review.turn_external_id, HEX_64_PATTERN);
+  const requestedAt = safeTimestamp(review.requested_at);
+  const workflow = safeString(review.workflow, CODE_PATTERN);
+  const status = safeString(review.status, /^(?:open|approved|revised|blocked)$/u);
+  if (
+    !id ||
+    actionRef === undefined ||
+    conversationExternalId === undefined ||
+    sourceEventId === undefined ||
+    traceId === undefined ||
+    turnExternalId === undefined ||
+    !requestedAt ||
+    !workflow ||
+    !status ||
+    !Number.isSafeInteger(review.priority) ||
+    Number(review.priority) < 0 ||
+    !Number.isSafeInteger(review.version) ||
+    Number(review.version) < 1 ||
+    Number(review.version) > 2_147_483_647
+  ) {
+    throw new TurnkeeperProtocolError("invalid_control_review", { requestId });
+  }
+
+  let policy: ControlReviewPolicy | null = null;
+  if (review.policy !== null) {
+    if (
+      !isPlainObject(review.policy) ||
+      !exactKeys(review.policy, new Set(["id", "name", "rule_code", "version"]))
+    ) {
+      throw new TurnkeeperProtocolError("invalid_control_review_policy", { requestId });
+    }
+    const policyId = safeString(review.policy.id, /^pol_[A-Za-z0-9_-]{1,96}$/u);
+    const ruleCode = safeString(review.policy.rule_code, CODE_PATTERN);
+    if (
+      !policyId ||
+      typeof review.policy.name !== "string" ||
+      review.policy.name.length < 1 ||
+      review.policy.name.length > 120 ||
+      !ruleCode ||
+      !Number.isSafeInteger(review.policy.version) ||
+      Number(review.policy.version) < 1 ||
+      Number(review.policy.version) > 2_147_483_647
+    ) {
+      throw new TurnkeeperProtocolError("invalid_control_review_policy", { requestId });
+    }
+    policy = {
+      id: policyId,
+      name: review.policy.name,
+      ruleCode,
+      version: Number(review.policy.version),
+    };
+  }
+
+  let resolution: ControlReviewResolution | null = null;
+  if (review.resolution !== null) {
+    if (
+      !isPlainObject(review.resolution) ||
+      !exactKeys(review.resolution, new Set(["decided_at", "outcome_code", "reason_code"]))
+    ) {
+      throw new TurnkeeperProtocolError("invalid_control_review_resolution", { requestId });
+    }
+    const decidedAt = safeTimestamp(review.resolution.decided_at);
+    const outcomeCode = safeString(review.resolution.outcome_code, CODE_PATTERN);
+    const reasonCode = safeString(review.resolution.reason_code, CODE_PATTERN);
+    if (!decidedAt || !outcomeCode || !reasonCode) {
+      throw new TurnkeeperProtocolError("invalid_control_review_resolution", { requestId });
+    }
+    resolution = { decidedAt, outcomeCode, reasonCode };
+  }
+  if ((status === "open") !== (resolution === null)) {
+    throw new TurnkeeperProtocolError("control_review_status_mismatch", { requestId });
+  }
+
+  return {
+    actionRef,
+    conversationExternalId,
+    id,
+    policy,
+    priority: Number(review.priority),
+    requestedAt,
+    requestId,
+    resolution,
+    sourceEventId,
+    status,
+    traceId,
+    turnExternalId,
+    version: Number(review.version),
+    workflow,
   };
 }
 
@@ -337,5 +514,19 @@ export class ControlClient {
         requestHash,
       ),
     };
+  }
+
+  async getReview(
+    reviewId: string,
+    options: ControlReviewGetOptions = {},
+  ): Promise<ControlReviewRecord> {
+    if (!REVIEW_ID_PATTERN.test(reviewId)) {
+      throw new TurnkeeperValidationError([{ path: "$.reviewId", code: "invalid_review_id" }]);
+    }
+    const response = await this.#transport.requestJson(`/api/v1/reviews/${reviewId}`, {
+      method: "GET",
+      ...(options.signal === undefined ? {} : { signal: options.signal }),
+    });
+    return parseReviewResponse(response);
   }
 }

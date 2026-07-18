@@ -9,6 +9,10 @@ The dated request and response contracts are published under
 `spec/control-check-response-2026-07-16.schema.json`. The SDK exports the matching
 `CONTROL_API_VERSION`.
 
+Project-scoped review retrieval uses
+`spec/control-review-response-2026-07-16.schema.json` and the matching
+`CONTROL_REVIEW_API_VERSION`.
+
 The hosted response is either a matched policy decision or a fail-closed
 `block` with `matched: false`, `policy: null`, and
 `reason_code: "no_policy_match"`. `ControlClient` normally resolves that case
@@ -24,8 +28,21 @@ correlation for requests that reach the server.
 5. Call `ControlClient.check` before the side effect.
 6. Stop on `block` or any error.
 7. Persist and pause on `review`.
-8. Execute only the exact immutable proposal on `allow` or `audit`.
-9. Record the downstream outcome and enqueue metadata-only Replay evidence.
+8. From a durable worker, call `ControlClient.getReview` until the review is terminal.
+9. Revalidate the exact immutable proposal and terminal outcome before resuming.
+10. Execute only the exact immutable proposal on `allow`, `audit`, or an approved review.
+11. Record the downstream outcome and enqueue metadata-only Replay evidence.
+
+## Review completion
+
+`ControlClient.getReview(reviewId)` retrieves one project-scoped review using the same API key. The
+key requires the `reviews:manage` scope. Human decisions remain authenticated dashboard actions;
+the SDK cannot approve its own request. Keep polling in application-owned durable work rather than
+holding a request or process open.
+
+Turnkeeper returns the review status and bounded reason codes. It does not execute, resume, or
+reconstruct the customer action. The customer application must load the immutable proposal that
+produced the original action binding and revalidate it before any side effect.
 
 ## Fail-closed behavior
 

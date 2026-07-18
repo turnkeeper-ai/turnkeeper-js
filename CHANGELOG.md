@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-No changes yet.
+## 0.1.0-alpha.4 - 2026-07-18
+
+- Add project-scoped `ControlClient.getReview` retrieval for durable customer-owned review polling.
+- Publish the dated Control review-response schema and include it in immutable release artifacts.
 
 ## 0.1.0-alpha.3 - 2026-07-17
 

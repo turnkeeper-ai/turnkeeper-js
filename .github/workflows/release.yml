@@ -108,6 +108,7 @@ jobs:
           cp spec/replay-2026-07-09.schema.json release-artifacts/
           cp spec/control-check-request-2026-07-16.schema.json release-artifacts/
           cp spec/control-check-response-2026-07-16.schema.json release-artifacts/
+          cp spec/control-review-response-2026-07-16.schema.json release-artifacts/
 
           for artifact in \
             "release-artifacts/turnkeeper-sdk-${version}.tgz" \
@@ -115,7 +116,8 @@ jobs:
             "release-artifacts/turnkeeper-mcp-${version}.tgz" \
             "release-artifacts/replay-2026-07-09.schema.json" \
             "release-artifacts/control-check-request-2026-07-16.schema.json" \
-            "release-artifacts/control-check-response-2026-07-16.schema.json"; do
+            "release-artifacts/control-check-response-2026-07-16.schema.json" \
+            "release-artifacts/control-review-response-2026-07-16.schema.json"; do
             test -f "${artifact}"
           done
 
