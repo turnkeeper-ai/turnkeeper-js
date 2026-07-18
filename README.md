@@ -37,6 +37,18 @@ See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
 [agent-builder skill](docs/agent-builder-skill.md). Maintainers should use the
 [public package release process](docs/releasing.md).
 
+## Community
+
+Start with the [public roadmap](ROADMAP.md) and choose an issue whose acceptance criteria are
+complete. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request, and use the issue
+forms for bugs, documentation improvements, and feature proposals.
+
+- [Contribution workflow](CONTRIBUTING.md)
+- [Public roadmap](ROADMAP.md)
+- [Support](SUPPORT.md)
+- [Governance](GOVERNANCE.md)
+- [Code of conduct](CODE_OF_CONDUCT.md)
+
 ## Security
 
 Keep Turnkeeper credentials server-side. Replay accepts metadata only, and a model-generated tool
