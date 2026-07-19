@@ -1,0 +1,73 @@
+name: DCO
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check:
+    name: DCO
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # pull_request_target keeps this workflow on the protected base branch.
+      # Do not add a checkout or execute code from the pull request here.
+      - name: Verify DCO sign-offs
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const commits = await github.paginate(
+              github.rest.pulls.listCommits,
+              {
+                ...context.repo,
+                pull_number: context.issue.number,
+                per_page: 100,
+              },
+            );
+
+            const failures = [];
+
+            for (const commit of commits) {
+              const authorName = commit.commit.author?.name?.trim() ?? "";
+              const authorEmail = commit.commit.author?.email?.trim().toLowerCase() ?? "";
+              const login = commit.author?.login ?? "";
+              const isMerge = commit.parents.length > 1;
+              const isBot =
+                commit.author?.type === "Bot" ||
+                login.endsWith("[bot]") ||
+                authorName.endsWith("[bot]");
+
+              if (isMerge || isBot) continue;
+
+              const signoffs = [
+                ...commit.commit.message.matchAll(
+                  /^Signed-off-by:\s*(.+?)\s*<([^<>]+)>\s*$/gim,
+                ),
+              ];
+              const validSignoff = signoffs.some(
+                (match) =>
+                  match[1].trim() === authorName &&
+                  match[2].trim().toLowerCase() === authorEmail,
+              );
+
+              if (!authorName || !authorEmail || !validSignoff) {
+                failures.push(commit.sha.slice(0, 12));
+              }
+            }
+
+            if (failures.length > 0) {
+              core.setFailed(
+                `Missing or mismatched DCO sign-off for commit(s): ${failures.join(", ")}. ` +
+                  "Add a Signed-off-by trailer whose name and email match the commit author.",
+              );
+            } else {
+              core.info(`DCO sign-offs verified for ${commits.length} pull-request commit(s).`);
+            }

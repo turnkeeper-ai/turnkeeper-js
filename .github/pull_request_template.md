@@ -19,6 +19,12 @@ Closes #
 - [ ] The change does not claim private or unshipped hosted behavior.
 - [ ] The package-content check passes.
 
+## Contribution certification
+
+- [ ] Every commit includes a `Signed-off-by` trailer matching its author.
+- [ ] I created this contribution or have the right to submit it under Apache-2.0.
+- [ ] I disclosed any incorporated third-party material and preserved its required notices.
+
 ## Verification
 
 - [ ] `npm run check`
