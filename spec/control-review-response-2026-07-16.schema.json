@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://turnkeeper.ai/schemas/control/review-response/2026-07-16.json",
+  "title": "Turnkeeper Control review response 2026-07-16",
+  "description": "A project-scoped human-review status or safe error response.",
+  "oneOf": [
+    { "$ref": "#/$defs/success" },
+    { "$ref": "#/$defs/error" }
+  ],
+  "$defs": {
+    "requestId": {
+      "type": "string",
+      "pattern": "^req_[A-Za-z0-9_-]{1,96}$"
+    },
+    "nullableOpaqueId": {
+      "oneOf": [
+        { "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/opaqueId" },
+        { "type": "null" }
+      ]
+    },
+    "success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["api_version", "request_id", "review"],
+      "properties": {
+        "api_version": { "const": "2026-07-16" },
+        "request_id": { "$ref": "#/$defs/requestId" },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_ref",
+            "conversation_external_id",
+            "id",
+            "policy",
+            "priority",
+            "requested_at",
+            "resolution",
+            "source_event_id",
+            "status",
+            "trace_id",
+            "turn_external_id",
+            "version",
+            "workflow"
+          ],
+          "properties": {
+            "action_ref": {
+              "oneOf": [
+                { "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/code" },
+                { "type": "null" }
+              ]
+            },
+            "conversation_external_id": { "$ref": "#/$defs/nullableOpaqueId" },
+            "id": { "type": "string", "pattern": "^rev_[A-Za-z0-9_-]{1,96}$" },
+            "policy": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["id", "name", "rule_code", "version"],
+                  "properties": {
+                    "id": { "type": "string", "pattern": "^pol_[A-Za-z0-9_-]{1,96}$" },
+                    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+                    "rule_code": {
+                      "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/code"
+                    },
+                    "version": { "type": "integer", "minimum": 1, "maximum": 2147483647 }
+                  }
+                }
+              ]
+            },
+            "priority": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+            "requested_at": { "type": "string", "minLength": 20, "maxLength": 35 },
+            "resolution": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["decided_at", "outcome_code", "reason_code"],
+                  "properties": {
+                    "decided_at": { "type": "string", "minLength": 20, "maxLength": 35 },
+                    "outcome_code": {
+                      "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/code"
+                    },
+                    "reason_code": {
+                      "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/code"
+                    }
+                  }
+                }
+              ]
+            },
+            "source_event_id": { "$ref": "#/$defs/nullableOpaqueId" },
+            "status": { "enum": ["open", "approved", "revised", "blocked"] },
+            "trace_id": { "$ref": "#/$defs/nullableOpaqueId" },
+            "turn_external_id": { "$ref": "#/$defs/nullableOpaqueId" },
+            "version": { "type": "integer", "minimum": 1, "maximum": 2147483647 },
+            "workflow": {
+              "$ref": "https://turnkeeper.ai/schemas/replay/2026-07-09.json#/$defs/code"
+            }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "status": { "const": "open" } }, "required": ["status"] },
+              "then": { "properties": { "resolution": { "type": "null" } } },
+              "else": { "properties": { "resolution": { "type": "object" } } }
+            }
+          ]
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "error"],
+      "properties": {
+        "request_id": { "$ref": "#/$defs/requestId" },
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code"],
+          "properties": {
+            "code": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,79}$" }
+          }
+        }
+      }
+    }
+  }
+}

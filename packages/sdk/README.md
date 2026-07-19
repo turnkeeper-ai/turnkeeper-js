@@ -110,6 +110,21 @@ if (result.decision === "block" || result.decision === "review") {
 hash mismatches, and any hosted decision that disagrees with the local policy bundle. It does not
 execute tools or resume approvals.
 
+When a durable worker revisits a paused proposal, retrieve the project-scoped review before doing
+anything else:
+
+```ts
+const review = await control.getReview(persistedReviewId);
+
+if (review.status === "open") return;
+if (review.status !== "approved") return permanentlyStopProposal();
+
+// Reload and revalidate the exact immutable proposal before executing it.
+```
+
+The API key requires `reviews:manage`. Review decisions remain human dashboard actions; SDK code
+cannot approve its own request.
+
 ## Development
 
 From the repository root:

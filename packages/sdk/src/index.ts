@@ -61,13 +61,21 @@ export {
   type ReplayWireResultError,
 } from "./replay/response.js";
 export type { TurnkeeperFetch } from "./transport.js";
-export { CONTROL_API_VERSION, ControlClient } from "./governance/control.js";
+export {
+  CONTROL_API_VERSION,
+  CONTROL_REVIEW_API_VERSION,
+  ControlClient,
+} from "./governance/control.js";
 export type {
   ControlCheckOptions,
   ControlCheckResult,
   ControlClientOptions,
   ControlEvidence,
   ControlReview,
+  ControlReviewGetOptions,
+  ControlReviewPolicy,
+  ControlReviewRecord,
+  ControlReviewResolution,
 } from "./governance/control.js";
 export {
   ACTION_CONTEXT_SCHEMA_VERSION,

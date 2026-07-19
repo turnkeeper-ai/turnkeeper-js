@@ -358,3 +358,84 @@ test("ControlClient rejects a same-decision hosted policy with the wrong rule", 
     },
   );
 });
+
+test("ControlClient retrieves a terminal review for durable customer-owned resume", async () => {
+  const client = new ControlClient({
+    apiKey: API_KEY,
+    baseUrl: "https://api.example.invalid",
+    fetch: async (input, init) => {
+      assert.equal(String(input), "https://api.example.invalid/api/v1/reviews/rev_synthetic");
+      assert.equal(init?.method, "GET");
+      return Response.json({
+        api_version: "2026-07-16",
+        request_id: "req_synthetic",
+        review: {
+          action_ref: "action_binding_1",
+          conversation_external_id: "a".repeat(64),
+          id: "rev_synthetic",
+          policy: {
+            id: "pol_synthetic",
+            name: "issue_refund review_required",
+            rule_code: "issue_refund.review_required",
+            version: 1,
+          },
+          priority: 80,
+          requested_at: "2026-07-18T10:00:00.000Z",
+          resolution: {
+            decided_at: "2026-07-18T10:05:00.000Z",
+            outcome_code: "approved_exact_proposal",
+            reason_code: "human_review_complete",
+          },
+          source_event_id: null,
+          status: "approved",
+          trace_id: null,
+          turn_external_id: "b".repeat(64),
+          version: 2,
+          workflow: "issue_refund",
+        },
+      });
+    },
+  });
+
+  const review = await client.getReview("rev_synthetic");
+  assert.equal(review.status, "approved");
+  assert.equal(review.resolution?.outcomeCode, "approved_exact_proposal");
+  assert.equal(review.requestId, "req_synthetic");
+});
+
+test("ControlClient rejects malformed review IDs and inconsistent terminal responses", async () => {
+  const client = new ControlClient({
+    apiKey: API_KEY,
+    baseUrl: "https://api.example.invalid",
+    fetch: async () =>
+      Response.json({
+        api_version: "2026-07-16",
+        request_id: "req_synthetic",
+        review: {
+          action_ref: null,
+          conversation_external_id: null,
+          id: "rev_synthetic",
+          policy: null,
+          priority: 0,
+          requested_at: "2026-07-18T10:00:00.000Z",
+          resolution: null,
+          source_event_id: null,
+          status: "approved",
+          trace_id: null,
+          turn_external_id: null,
+          version: 2,
+          workflow: "issue_refund",
+        },
+      }),
+  });
+
+  await assert.rejects(() => client.getReview("unsafe"), /validation/u);
+  await assert.rejects(
+    () => client.getReview("rev_synthetic"),
+    (error: unknown) => {
+      assert.ok(error instanceof TurnkeeperProtocolError);
+      assert.equal(error.code, "control_review_status_mismatch");
+      return true;
+    },
+  );
+});
