@@ -83,5 +83,20 @@ orchestration claims before matching public server endpoints exist. Never includ
 credentials, production identifiers, internal runbooks, deployment configuration, or private
 strategy in issues, fixtures, errors, logs, or package files.
 
-Contributions are accepted under the repository's Apache-2.0 license. Participation is governed by
+Contributions are accepted under the repository's Apache-2.0 license. By contributing, you certify
+every commit under the [Developer Certificate of Origin 1.1](DCO). Each commit must contain a
+`Signed-off-by` trailer whose name and email match the commit author:
+
+```bash
+git commit -s -m "feat(scope): describe the change"
+```
+
+The sign-off records your certification; it is not a GPG or cryptographic signature. Configure your
+Git identity before committing, and amend an unsigned latest commit with:
+
+```bash
+git commit --amend --no-edit --signoff
+```
+
+Pull requests cannot merge until the required DCO check confirms every commit. Participation is governed by
 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
