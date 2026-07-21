@@ -21,7 +21,7 @@ export TURNKEEPER_WORKSPACE_ROOT=/absolute/path/to/your/project
 turnkeeper-mcp
 ```
 
-Example MCP host configuration:
+Host-neutral MCP configuration shape (**unverified in external clients**):
 
 ```json
 {
@@ -60,3 +60,6 @@ echoes a production binding secret. Its action binding cannot authorize a runtim
 
 `inspect_integration` is a heuristic development aid, not a security proof. Review every generated
 integration and ensure all side effects remain behind one authenticated, server-side executor.
+
+For the current client verification matrix, shared stdio requirements, read-only tool-discovery
+check, and troubleshooting steps, see [Turnkeeper MCP documentation](../../docs/mcp.md).

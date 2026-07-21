@@ -14,7 +14,7 @@ After the alpha package is published:
 TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.5
 ```
 
-Example MCP host configuration:
+Host-neutral MCP configuration shape (**unverified in external clients**):
 
 ```json
 {
@@ -29,6 +29,48 @@ Example MCP host configuration:
   }
 }
 ```
+
+## Client setup matrix
+
+The repository currently verifies the protocol surface with the official TypeScript MCP client
+and an in-memory transport. No external desktop or editor client is maintainer-verified yet, so the
+table deliberately avoids claiming support or publishing client-specific JSON.
+
+| Client or harness | Status | Setup note |
+|---|---|---|
+| Repository MCP SDK harness | Verified in `npm run check` | Connects to `createMcpServer` and lists tools without running a business action. |
+| Claude Desktop | Unverified | Adapt the host-neutral stdio shape to the client's documented config location. |
+| Cursor | Unverified | Adapt the host-neutral stdio shape; confirm its project versus user precedence first. |
+| VS Code MCP hosts | Unverified | Confirm the extension's stdio and environment schema before adding the server. |
+| Other stdio MCP hosts | Unverified | Require support for a command, arguments, and an environment map. |
+
+All stdio hosts have the same runtime requirements:
+
+- Run the published package with `npx -y @turnkeeper/mcp@0.1.0-alpha.4`, or build this monorepo and
+  run `turnkeeper-mcp` from the package binary.
+- Set `TURNKEEPER_WORKSPACE_ROOT` to an absolute, trusted project directory. Relative inspection
+  paths are resolved beneath that boundary; the process does not require a particular current
+  working directory when the environment variable is absolute.
+- Keep stdout exclusively for MCP protocol messages. Send wrapper diagnostics to stderr.
+- Use synthetic project content and do not add credentials to the MCP environment.
+
+## Confirm tool discovery
+
+Use the client's tool-list or server-inspector view and confirm that `get_turnkeeper_quickstart`
+appears. Listing tools is read-only and does not execute a business action. In this repository,
+`npm test --workspace @turnkeeper/mcp` performs the equivalent assertion with the official MCP SDK
+client.
+
+## Troubleshooting
+
+| Symptom | Check |
+|---|---|
+| `command not found` | Use an absolute local binary path, or ensure `npx` is on the GUI client's inherited `PATH`. |
+| Missing `dist/bin.js` | Run `npm run build` before using the monorepo binary; published packages include `dist`. |
+| Workspace-root startup failure | Set `TURNKEEPER_WORKSPACE_ROOT` to an existing absolute directory accessible to the client process. |
+| JSON configuration rejected | Validate strict JSON: no comments or trailing commas, and use the client's exact command/args/env field names. |
+| Protocol parse errors or disconnects | Remove shell banners and debug prints from stdout; MCP stdio reserves stdout for protocol frames. |
+| Server starts but tools are absent | Fully restart the client, inspect its MCP logs, then use read-only tool discovery before calling a tool. |
 
 Run MCP only in a trusted development environment. Do not pass production credentials, customer
 content, transcripts, exact tool arguments, or secrets to the server. The server refuses to start
@@ -88,5 +130,5 @@ npm run build
 TURNKEEPER_WORKSPACE_ROOT="$PWD" npm exec --workspace @turnkeeper/mcp -- turnkeeper-mcp
 ```
 
-See [Agent-builder skill](agent-builder-skill.md) and
-[Repository boundary](repository-boundary.md).
+See the package-level [MCP README](../packages/mcp/README.md), [Agent-builder
+skill](agent-builder-skill.md), and [Repository boundary](repository-boundary.md).
