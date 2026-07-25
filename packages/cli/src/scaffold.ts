@@ -25,7 +25,7 @@ import type {
   SupportedLanguage,
 } from "./content.js";
 
-const SDK_VERSION = "0.1.0-alpha.5";
+const SDK_VERSION = "0.1.0-alpha.6";
 const MAX_SCAFFOLD_FILES = 64;
 const MAX_SCAFFOLD_BYTES = 512 * 1024;
 

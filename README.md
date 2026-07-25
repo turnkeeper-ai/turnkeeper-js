@@ -34,9 +34,9 @@ for reproducible installs; the moving `next` channel is available for deliberate
 tracking.
 
 ```bash
-npm install @turnkeeper/sdk@0.1.0-alpha.5
-npm install --save-dev @turnkeeper/cli@0.1.0-alpha.5
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx -y @turnkeeper/mcp@0.1.0-alpha.5
+npm install @turnkeeper/sdk@0.1.0-alpha.6
+npm install --save-dev @turnkeeper/cli@0.1.0-alpha.6
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx -y @turnkeeper/mcp@0.1.0-alpha.6
 ```
 
 Equivalent moving-channel package specs are `@turnkeeper/sdk@next`, `@turnkeeper/cli@next`, and

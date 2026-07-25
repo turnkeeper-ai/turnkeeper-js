@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.1.0-alpha.6 - 2026-07-25
+
+- Replace the host-specific MCP configuration example with a portable stdio process fragment,
+  add an honest client-verification matrix, and document safe tool discovery and troubleshooting.
+- Make exact alpha installation commands explicit across the SDK, CLI, MCP, and repository docs,
+  distinguish npm's `latest` and `next` channels, and validate release-version alignment.
+
 ## 0.1.0-alpha.5 - 2026-07-25
 
 - Replace the monolithic MCP SDK with exact-pinned split v2 beta server and test-client packages,

@@ -4,14 +4,14 @@
 tools. It exposes deterministic Turnkeeper integration guidance without executing production
 actions.
 
-The package is prerelease at `0.1.0-alpha.5`.
+The package is prerelease at `0.1.0-alpha.6`.
 
 ## Start the server
 
 After the alpha package is published:
 
 ```sh
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.5
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.6
 ```
 
 Portable stdio process settings (**unverified in external clients**):
@@ -19,7 +19,7 @@ Portable stdio process settings (**unverified in external clients**):
 ```json
 {
   "command": "npx",
-  "args": ["-y", "@turnkeeper/mcp@0.1.0-alpha.5"],
+  "args": ["-y", "@turnkeeper/mcp@0.1.0-alpha.6"],
   "env": {
     "TURNKEEPER_WORKSPACE_ROOT": "/absolute/path/to/your/project"
   }
@@ -46,7 +46,7 @@ table deliberately avoids claiming support or publishing client-specific JSON.
 
 All stdio hosts have the same runtime requirements:
 
-- Run the published package with `npx -y @turnkeeper/mcp@0.1.0-alpha.5`, or build this monorepo and
+- Run the published package with `npx -y @turnkeeper/mcp@0.1.0-alpha.6`, or build this monorepo and
   run `turnkeeper-mcp` from the package binary.
 - Set `TURNKEEPER_WORKSPACE_ROOT` to an absolute, trusted project directory. Relative inspection
   paths are resolved beneath that boundary; the process does not require a particular current

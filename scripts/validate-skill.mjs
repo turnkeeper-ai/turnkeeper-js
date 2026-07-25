@@ -3,14 +3,36 @@ import path from "node:path";
 import process from "node:process";
 
 const root = process.cwd();
-const version = "0.1.0-alpha.5";
+const version = "0.1.0-alpha.6";
 const packageDirectories = ["packages/sdk", "packages/cli", "packages/mcp"];
+const exampleDirectories = [
+  "examples/customer-support-agent",
+  "examples/booking-agent",
+  "examples/account-management-agent",
+];
 const installationGuides = [
   ["README.md", "@turnkeeper/sdk"],
   ["packages/sdk/README.md", "@turnkeeper/sdk"],
   ["packages/cli/README.md", "@turnkeeper/cli"],
   ["packages/mcp/README.md", "@turnkeeper/mcp"],
+  ["docs/mcp.md", "@turnkeeper/mcp"],
+  ["examples/customer-support-agent/README.md", "@turnkeeper/cli"],
+  ["examples/booking-agent/README.md", "@turnkeeper/cli"],
+  ["examples/account-management-agent/README.md", "@turnkeeper/cli"],
   ["docs/versioning.md", "@turnkeeper/sdk"],
+];
+const versionReferences = [
+  ["docs/agent-builder-skill.md", `\`${version}\``],
+  ["docs/releasing.md", `version="${version}"`],
+  ["packages/sdk/src/transport.ts", `turnkeeper-sdk/${version}`],
+  ["packages/cli/src/cli.ts", `@turnkeeper/sdk@${version}`],
+  ["packages/cli/src/scaffold.ts", `"${version}"`],
+  ["packages/mcp/src/server.ts", `"${version}"`],
+  ["skills/turnkeeper-agent-builder/SKILL.md", `\`${version}\``],
+  [
+    "skills/turnkeeper-agent-builder/references/public-packages.md",
+    `@turnkeeper/cli@${version}`,
+  ],
 ];
 const requiredPaths = [
   "LICENSE",
@@ -54,6 +76,12 @@ for (const [file, packageName] of installationGuides) {
   }
 }
 
+for (const [file, expected] of versionReferences) {
+  if (!(await text(file)).includes(expected)) {
+    throw new Error(`${file} must include release-aligned value ${expected}.`);
+  }
+}
+
 if (!(await text(".github/ISSUE_TEMPLATE/bug.yml")).includes(version)) {
   throw new Error(`Bug reports must prompt for the current alpha ${version}.`);
 }
@@ -77,6 +105,11 @@ if (!description || description.length < 40 || description.length > 1_024) {
   );
 }
 
+const rootManifest = JSON.parse(await text("package.json"));
+if (rootManifest.version !== version) {
+  throw new Error(`Root manifest must use synchronized version ${version}.`);
+}
+
 for (const directory of packageDirectories) {
   const manifest = JSON.parse(await text(`${directory}/package.json`));
   if (manifest.version !== version) {
@@ -88,6 +121,28 @@ for (const directory of packageDirectories) {
     throw new Error(`${manifest.name} must be a public Apache-2.0 package.`);
   }
   await text(`${directory}/LICENSE`);
+}
+
+for (const directory of exampleDirectories) {
+  const manifest = JSON.parse(await text(`${directory}/package.json`));
+  if (
+    manifest.version !== version ||
+    manifest.dependencies?.["@turnkeeper/sdk"] !== version
+  ) {
+    throw new Error(
+      `${manifest.name} must use synchronized example and SDK version ${version}.`,
+    );
+  }
+}
+
+const lock = JSON.parse(await text("package-lock.json"));
+if (lock.version !== version || lock.packages?.[""]?.version !== version) {
+  throw new Error(`Package lock root must use synchronized version ${version}.`);
+}
+for (const directory of [...packageDirectories, ...exampleDirectories]) {
+  if (lock.packages?.[directory]?.version !== version) {
+    throw new Error(`${directory} package lock entry must use ${version}.`);
+  }
 }
 
 const cli = JSON.parse(await text("packages/cli/package.json"));

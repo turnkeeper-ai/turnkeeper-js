@@ -4,6 +4,7 @@ The public packages use semantic versioning. Replay uses a separate dated wire v
 
 | SDK version   | Replay API version | Status              |
 | ------------- | ------------------ | ------------------- |
+| 0.1.0-alpha.6 | 2026-07-09         | MCP setup and installation guidance prerelease |
 | 0.1.0-alpha.5 | 2026-07-09         | contributor hardening prerelease |
 | 0.1.0-alpha.4 | 2026-07-18         | review retrieval prerelease |
 | 0.1.0-alpha.3 | 2026-07-09         | prepared prerelease |
@@ -19,7 +20,7 @@ change existing event serialization.
 The current prerelease is published under npm's `next` dist-tag. `latest` remains on
 `0.1.0-alpha.2` until maintainers make a separate promotion decision.
 
-- Prefer exact versions such as `@turnkeeper/sdk@0.1.0-alpha.5` in application manifests and
+- Prefer exact versions such as `@turnkeeper/sdk@0.1.0-alpha.6` in application manifests and
   reproducible commands.
 - Use `@turnkeeper/sdk@next` only when intentionally following the moving prerelease channel.
 - Avoid unversioned package specs during alpha because they resolve through `latest`, not `next`.

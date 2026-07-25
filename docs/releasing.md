@@ -87,7 +87,7 @@ After the workflow succeeds, verify the registry and release from a clean machin
 directory:
 
 ```sh
-version="0.1.0-alpha.5"
+version="0.1.0-alpha.6"
 
 npm view "@turnkeeper/sdk@${version}" version dist.integrity \
   dist.attestations.provenance.predicateType
