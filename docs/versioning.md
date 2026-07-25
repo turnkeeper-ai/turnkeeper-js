@@ -4,6 +4,7 @@ The public packages use semantic versioning. Replay uses a separate dated wire v
 
 | SDK version   | Replay API version | Status              |
 | ------------- | ------------------ | ------------------- |
+| 0.1.0-alpha.5 | 2026-07-09         | contributor hardening prerelease |
 | 0.1.0-alpha.4 | 2026-07-18         | review retrieval prerelease |
 | 0.1.0-alpha.3 | 2026-07-09         | prepared prerelease |
 | 0.1.0-alpha.2 | 2026-07-09         | public prerelease   |
