@@ -1,5 +1,7 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import {
+  Client,
+  InMemoryTransport,
+} from "@modelcontextprotocol/client";
 import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
@@ -23,17 +25,25 @@ test("bin fails with one sanitized message when the workspace root is missing", 
   assert.equal(result.stderr, "Turnkeeper MCP server failed to start.\n");
 });
 
-test("MCP exposes only deterministic development tools and sanitizes path failures", async () => {
+test("MCP accepts a v1-compatible handshake and sanitizes path failures", async () => {
   const workspace = await mkdtemp(path.join(tmpdir(), "turnkeeper-mcp-server-"));
   const project = path.join(workspace, "agent");
   await mkdir(project);
   await writeFile(path.join(project, "agent.ts"), "export const agent = true;\n", "utf8");
 
   const server = await createMcpServer({ workspaceRoot: workspace });
-  const client = new Client({ name: "turnkeeper-mcp-test", version: "1.0.0" });
+  const client = new Client(
+    { name: "turnkeeper-mcp-test", version: "1.0.0" },
+    {
+      supportedProtocolVersions: ["2025-11-25"],
+      versionNegotiation: { mode: "legacy" },
+    },
+  );
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   try {
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
+    assert.equal(client.getNegotiatedProtocolVersion(), "2025-11-25");
+    assert.equal(client.getProtocolEra(), "legacy");
     const listed = await client.listTools();
     assert.deepEqual(
       listed.tools.map((tool) => tool.name).sort(),

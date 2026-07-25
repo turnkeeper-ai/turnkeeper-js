@@ -2,6 +2,8 @@ import { createHmac } from "node:crypto";
 
 import { z } from "zod";
 
+import type { TurnkeeperValidationIssue } from "../errors.js";
+
 const CODE_PATTERN = /^[a-z0-9][a-z0-9_.:/-]{0,119}$/u;
 const SIGNAL_KEY_PATTERN = /^[a-z][a-z0-9_.-]{0,63}$/u;
 const ROLE_PATTERN = /^[a-z][a-z0-9_-]{0,63}$/u;
@@ -270,16 +272,51 @@ export interface GeneratedPolicyTests {
 
 export class GovernanceInputError extends Error {
   readonly code: string;
+  readonly issues: readonly TurnkeeperValidationIssue[];
 
-  constructor(code: string) {
+  constructor(
+    code: string,
+    issues: readonly TurnkeeperValidationIssue[] = [],
+  ) {
     super("Turnkeeper governance input failed validation.");
     this.name = "GovernanceInputError";
     this.code = code;
+    this.issues = issues.map(({ path, code: issueCode }) => ({
+      path,
+      code: issueCode,
+    }));
   }
 
   toJSON(): Record<string, unknown> {
-    return { code: this.code, message: this.message, name: this.name };
+    return {
+      code: this.code,
+      issues: this.issues,
+      message: this.message,
+      name: this.name,
+    };
   }
+}
+
+function zodIssuePath(path: readonly PropertyKey[]): string {
+  return path.reduce<string>((result, segment) => {
+    if (typeof segment === "number" && Number.isSafeInteger(segment) && segment >= 0) {
+      return `${result}[${segment}]`;
+    }
+    if (typeof segment === "string" && /^[A-Za-z][A-Za-z0-9_]*$/u.test(segment)) {
+      return `${result}.${segment}`;
+    }
+    return result;
+  }, "$");
+}
+
+function zodInputIssues(error: z.ZodError): readonly TurnkeeperValidationIssue[] {
+  return error.issues.map((issue) => ({
+    path: zodIssuePath(issue.path),
+    code:
+      issue.code === "custom" && /^[a-z][a-z0-9_]{0,79}$/u.test(issue.message)
+        ? issue.message
+        : issue.code,
+  }));
 }
 
 function looksUnsafeMetadataString(value: string): boolean {
@@ -393,7 +430,12 @@ function createPolicy(
 
 export function generatePolicy(input: GeneratePolicyInput): PolicyBundle {
   const parsed = GeneratePolicyInputSchema.safeParse(input);
-  if (!parsed.success) throw new GovernanceInputError("invalid_policy_generation_input");
+  if (!parsed.success) {
+    throw new GovernanceInputError(
+      "invalid_policy_generation_input",
+      zodInputIssues(parsed.error),
+    );
+  }
   const value = parsed.data;
   const decision = primaryDecision(value);
   const condition: PolicyCondition = value.requiredConditions[0] ?? {

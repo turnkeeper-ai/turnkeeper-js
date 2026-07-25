@@ -19,7 +19,11 @@ test("inspection paths remain beneath the configured real workspace root", async
     await mkdir(project, { recursive: true });
     await mkdir(outside, { recursive: true });
     await writeFile(path.join(project, "agent.ts"), "export const safe = true;\n", "utf8");
-    await symlink(outside, path.join(workspace, "outside-link"));
+    await symlink(
+      outside,
+      path.join(workspace, "outside-link"),
+      process.platform === "win32" ? "junction" : "dir",
+    );
 
     const root = await resolveWorkspaceRoot(workspace);
     assert.equal(await resolveInspectionPath(root, "agent"), path.join(root, "agent"));

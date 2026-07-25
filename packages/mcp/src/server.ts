@@ -1,5 +1,5 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { McpServer } from "@modelcontextprotocol/server";
+import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 import {
   ActionContextSchema,
   GeneratePolicyInputSchema,
@@ -153,7 +153,7 @@ function registerTools(
     {
       description:
         "Return deterministic integration guidance. This tool never authorizes or executes an action.",
-      inputSchema: QuickstartInputSchema.shape,
+      inputSchema: QuickstartInputSchema,
     },
     boundedHandler(QuickstartInputSchema, handlers.get_turnkeeper_quickstart),
   );
@@ -162,7 +162,7 @@ function registerTools(
     {
       description:
         "Return bounded SDK examples that contain no credentials, customer content, or execution.",
-      inputSchema: SdkExamplesInputSchema.shape,
+      inputSchema: SdkExamplesInputSchema,
     },
     boundedHandler(SdkExamplesInputSchema, handlers.get_sdk_examples),
   );
@@ -171,7 +171,7 @@ function registerTools(
     {
       description:
         "Return a deterministic starter file plan. The MCP server does not write files or execute actions.",
-      inputSchema: ScaffoldInputSchema.shape,
+      inputSchema: ScaffoldInputSchema,
     },
     boundedHandler(ScaffoldInputSchema, handlers.scaffold_turnkeeper_agent),
   );
@@ -180,7 +180,7 @@ function registerTools(
     {
       description:
         "Generate a bounded policy bundle for development. Generated output is not production authorization.",
-      inputSchema: GeneratePolicySchema.shape,
+      inputSchema: GeneratePolicySchema,
     },
     boundedHandler(GeneratePolicySchema, handlers.generate_policy),
   );
@@ -189,7 +189,7 @@ function registerTools(
     {
       description:
         "Validate one bounded policy bundle without calling Turnkeeper.",
-      inputSchema: ValidatePolicyWireSchema.shape,
+      inputSchema: ValidatePolicyWireSchema,
     },
     boundedHandler(ValidatePolicySchema, handlers.validate_policy),
   );
@@ -198,7 +198,7 @@ function registerTools(
     {
       description:
         "Simulate a bounded policy decision locally. Simulation never authorizes a production action.",
-      inputSchema: SimulateActionWireSchema.shape,
+      inputSchema: SimulateActionWireSchema,
     },
     boundedHandler(SimulateActionSchema, handlers.simulate_action),
   );
@@ -207,7 +207,7 @@ function registerTools(
     {
       description:
         "Generate deterministic policy test cases without executing customer or provider actions.",
-      inputSchema: GeneratePolicyTestsWireSchema.shape,
+      inputSchema: GeneratePolicyTestsWireSchema,
     },
     boundedHandler(GeneratePolicyTestsSchema, handlers.generate_policy_tests),
   );
@@ -216,7 +216,7 @@ function registerTools(
     {
       description:
         "Heuristically inspect source beneath the configured workspace root. Findings are not a security proof.",
-      inputSchema: InspectIntegrationSchema.shape,
+      inputSchema: InspectIntegrationSchema,
     },
     boundedHandler(InspectIntegrationSchema, handlers.inspect_integration),
   );
@@ -225,7 +225,7 @@ function registerTools(
     {
       description:
         "Return deterministic migration guidance without modifying files or contacting production.",
-      inputSchema: MigrationHelpSchema.shape,
+      inputSchema: MigrationHelpSchema,
     },
     boundedHandler(MigrationHelpSchema, handlers.get_migration_help),
   );

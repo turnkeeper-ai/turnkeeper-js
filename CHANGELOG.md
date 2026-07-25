@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Replace the monolithic MCP SDK with exact-pinned split v2 beta server and test-client packages,
+  removing known dependency advisories while preserving the local stdio-only boundary and stable
+  v1-compatible 2025 client handshake.
+- Gate pull requests and pushes on a production-dependency audit that fails for high or critical
+  advisories.
+- Run the complete repository gate on Windows and exercise linked-directory boundary tests with
+  junctions that do not require elevated symbolic-link privileges.
+- Report client-configuration and policy-generation failures with sanitized field-level issues
+  while preserving existing Replay validation behavior.
+- Pin the CLI installation example to the current prerelease so new contributors do not
+  accidentally install an older npm prerelease tag.
+
 ## 0.1.0-alpha.4 - 2026-07-18
 
 - Add project-scoped `ControlClient.getReview` retrieval for durable customer-owned review polling.

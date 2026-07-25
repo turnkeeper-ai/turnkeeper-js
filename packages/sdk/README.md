@@ -110,6 +110,12 @@ if (result.decision === "block" || result.decision === "review") {
 hash mismatches, and any hosted decision that disagrees with the local policy bundle. It does not
 execute tools or resume approvals.
 
+Local validation errors expose safe field diagnostics as `issues: [{ path, code }]` and never
+include rejected values. Invalid `TurnkeeperClient` options throw `TurnkeeperValidationError` with
+the top-level code `invalid_client_configuration`; invalid Replay inputs retain
+`invalid_replay_input`. `GovernanceInputError` uses its operation-specific top-level code and adds
+the same sanitized `issues` shape for schema failures.
+
 When a durable worker revisits a paused proposal, retrieve the project-scoped review before doing
 anything else:
 

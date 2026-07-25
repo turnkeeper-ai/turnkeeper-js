@@ -47,6 +47,26 @@ npm run check
 Include the command and result in the pull request. If a check cannot run, explain exactly why and
 what remains unverified.
 
+### Environment troubleshooting
+
+Confirm the active runtime before investigating an install or native dependency failure:
+
+```bash
+node --version
+npm --version
+node -p '`${process.platform} ${process.arch}`'
+```
+
+After changing Node installations or CPU architecture, run `npm ci` again. It recreates
+`node_modules` from the committed lockfile; do not regenerate `package-lock.json` to conceal a
+runtime mismatch. On Windows, the link-boundary tests use directory junctions so they do not
+require Developer Mode or administrator-only symbolic-link privileges. If a supported Windows
+environment still reports `EPERM`, include the command, runtime values above, and relevant policy
+restrictions in the pull request instead of skipping the test.
+
+Do not bypass tests or edit generated package output while troubleshooting. Return to the
+[development commands](#development) after correcting the environment.
+
 ## Pull requests
 
 Pull requests should:

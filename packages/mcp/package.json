@@ -57,12 +57,13 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.29.0",
+    "@modelcontextprotocol/server": "2.0.0-beta.5",
     "@turnkeeper/cli": "0.1.0-alpha.4",
     "@turnkeeper/sdk": "0.1.0-alpha.4",
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@modelcontextprotocol/client": "2.0.0-beta.5",
     "@types/node": "22.19.9",
     "tsx": "4.23.0",
     "typescript": "5.7.3"

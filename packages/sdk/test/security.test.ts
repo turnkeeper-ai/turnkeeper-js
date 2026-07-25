@@ -21,11 +21,50 @@ test("rejects insecure remote URLs and credential-bearing URLs", () => {
   assert.doesNotThrow(() => new TurnkeeperClient({ apiKey: API_KEY, baseUrl: "http://localhost:3000" }));
 });
 
-test("rejects malformed credentials before transport", () => {
-  assert.throws(
-    () => new TurnkeeperClient({ apiKey: "not-a-key", baseUrl: "https://example.invalid" }),
-    TurnkeeperValidationError,
-  );
+test("reports client configuration failures with safe field-level diagnostics", () => {
+  const malformedApiKey = `tk_test_${"a".repeat(31)}`;
+  const invalidBaseUrl = "https://example.invalid/synthetic-configuration-canary";
+  const cases = [
+    {
+      options: {
+        apiKey: malformedApiKey,
+        baseUrl: "https://example.invalid",
+      },
+      issue: { path: "$.apiKey", code: "invalid_api_key" },
+      rejectedValue: malformedApiKey,
+    },
+    {
+      options: { apiKey: API_KEY, baseUrl: invalidBaseUrl },
+      issue: { path: "$.baseUrl", code: "invalid_base_url" },
+      rejectedValue: invalidBaseUrl,
+    },
+    {
+      options: {
+        apiKey: API_KEY,
+        baseUrl: "https://example.invalid",
+        timeoutMs: 0,
+      },
+      issue: { path: "$.timeoutMs", code: "invalid_timeout" },
+      rejectedValue: "0",
+    },
+  ];
+
+  for (const { options, issue, rejectedValue } of cases) {
+    assert.throws(
+      () => new TurnkeeperClient(options),
+      (error: unknown) => {
+        assert.ok(error instanceof TurnkeeperValidationError);
+        assert.equal(error.code, "invalid_client_configuration");
+        assert.equal(
+          error.message,
+          "Turnkeeper client configuration failed local validation.",
+        );
+        assert.deepEqual(error.issues, [issue]);
+        assert.equal(JSON.stringify(error).includes(rejectedValue), false);
+        return true;
+      },
+    );
+  }
 });
 
 test("refuses redirects without retrying or forwarding credentials", async () => {

@@ -14,6 +14,7 @@
     "examples/*"
   ],
   "scripts": {
+    "audit:dependencies": "npm audit --omit=dev --audit-level=high",
     "build": "npm run build --workspace @turnkeeper/sdk && npm run build --workspaces --if-present",
     "check": "npm run build && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present && npm run package:check --workspaces --if-present && npm run smoke:packages && node scripts/validate-skill.mjs",
     "package:check": "npm run package:check --workspaces --if-present",
