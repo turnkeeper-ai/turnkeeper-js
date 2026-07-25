@@ -10,7 +10,7 @@ Its policy simulation is development-time evidence, not production authorization
 ## Install
 
 ```sh
-npm install --save-dev @turnkeeper/cli@0.1.0-alpha.5
+npm install --save-dev @turnkeeper/cli@0.1.0-alpha.6
 ```
 
 Pin the version shown above for reproducibility. npm's unversioned `latest` channel still resolves
@@ -36,7 +36,7 @@ turnkeeper inspect [directory]
 published with one directory rename. Existing roots use staged files, atomic no-clobber links for
 new files, backups for explicitly forced replacements, and rollback on a commit error.
 
-Generated projects depend on the exact published `@turnkeeper/sdk@0.1.0-alpha.5` package rather
+Generated projects depend on the exact published `@turnkeeper/sdk@0.1.0-alpha.6` package rather
 than monorepo-only workspace references. They include strict TypeScript configuration plus
 `typecheck`, `test`, and `check` scripts. `add-agent` leaves an existing root `package.json`,
 `tsconfig.json`, and `README.md` untouched; install `@turnkeeper/sdk` separately in that project.
