@@ -37,7 +37,8 @@ test("release workflow exchanges GitHub OIDC and creates only a hosted draft", a
   const result = await syncReleaseChangelogDraft({
     env: {
       ACTIONS_ID_TOKEN_REQUEST_TOKEN: "synthetic-request-token",
-      ACTIONS_ID_TOKEN_REQUEST_URL: "https://token.actions.githubusercontent.com/oidc?job=synthetic",
+      ACTIONS_ID_TOKEN_REQUEST_URL:
+        "https://pipelines.actions.githubusercontent.com/oidc?job=synthetic",
       GITHUB_REPOSITORY: "turnkeeper-ai/turnkeeper-js",
       RELEASE_TAG: "v0.1.0-alpha.6",
     },
@@ -76,7 +77,7 @@ test("release workflow rejects untrusted OIDC and sanitized endpoint failures", 
     syncReleaseChangelogDraft({
       env: {
         ACTIONS_ID_TOKEN_REQUEST_TOKEN: "synthetic-request-token",
-        ACTIONS_ID_TOKEN_REQUEST_URL: "https://token.actions.githubusercontent.com/oidc",
+        ACTIONS_ID_TOKEN_REQUEST_URL: "https://pipelines.actions.githubusercontent.com/oidc",
         GITHUB_REPOSITORY: "turnkeeper-ai/turnkeeper-js",
         RELEASE_TAG: "v0.1.0-alpha.6",
       },

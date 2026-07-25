@@ -31,7 +31,10 @@ export function releaseChangelogDraft(tag) {
 
 async function requestGitHubOidcToken({ env, fetchImpl }) {
   const requestUrl = new URL(required(env, "ACTIONS_ID_TOKEN_REQUEST_URL", 4_096));
-  if (requestUrl.protocol !== "https:" || requestUrl.hostname !== "token.actions.githubusercontent.com") {
+  if (
+    requestUrl.protocol !== "https:" ||
+    requestUrl.hostname !== "pipelines.actions.githubusercontent.com"
+  ) {
     throw new Error("GitHub OIDC request URL is not trusted.");
   }
   requestUrl.searchParams.set("audience", CHANGELOG_AUDIENCE);
