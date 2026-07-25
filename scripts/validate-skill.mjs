@@ -39,7 +39,10 @@ async function text(file) {
 
 for (const file of requiredPaths) await text(file);
 
-const skill = await text("skills/turnkeeper-agent-builder/SKILL.md");
+const skill = (await text("skills/turnkeeper-agent-builder/SKILL.md")).replace(
+  /\r\n?/gu,
+  "\n",
+);
 if (!skill.startsWith("---\n"))
   throw new Error("Skill frontmatter is missing.");
 const frontmatterEnd = skill.indexOf("\n---\n", 4);
