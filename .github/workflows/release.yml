@@ -303,3 +303,6 @@ jobs:
             --prerelease \
             --title "${RELEASE_TAG}" \
             --verify-tag
+
+      - name: Create or refresh the hosted changelog draft
+        run: node scripts/changelogDraftClient.mjs
