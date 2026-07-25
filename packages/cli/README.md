@@ -13,6 +13,9 @@ Its policy simulation is development-time evidence, not production authorization
 npm install --save-dev @turnkeeper/cli@0.1.0-alpha.5
 ```
 
+Pin the version shown above for reproducibility. npm's unversioned `latest` channel still resolves
+to `0.1.0-alpha.2`; use `@turnkeeper/cli@next` only to follow the moving prerelease channel.
+
 Run it through the local package binary:
 
 ```sh

@@ -27,6 +27,22 @@ npm run check
 The packages are pre-release software. Pin exact versions and review the documented safety
 boundaries before using them in a production workflow.
 
+## Install the current alpha
+
+npm's unversioned `latest` channel still resolves to `0.1.0-alpha.2`. Use the exact current alpha
+for reproducible installs; the moving `next` channel is available for deliberate prerelease
+tracking.
+
+```bash
+npm install @turnkeeper/sdk@0.1.0-alpha.5
+npm install --save-dev @turnkeeper/cli@0.1.0-alpha.5
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx -y @turnkeeper/mcp@0.1.0-alpha.5
+```
+
+Equivalent moving-channel package specs are `@turnkeeper/sdk@next`, `@turnkeeper/cli@next`, and
+`@turnkeeper/mcp@next`. Do not use an unversioned install until the project explicitly promotes a
+release to `latest`.
+
 ## Packages
 
 - [`@turnkeeper/sdk`](packages/sdk/README.md)
