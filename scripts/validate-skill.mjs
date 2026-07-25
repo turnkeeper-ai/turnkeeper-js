@@ -126,16 +126,20 @@ async function sourceFiles(directory) {
 }
 
 for (const file of await sourceFiles(".")) {
-  if (file === "package-lock.json" || file === "scripts/validate-skill.mjs")
+  const portableFile = file.replaceAll("\\", "/");
+  if (
+    portableFile === "package-lock.json" ||
+    portableFile === "scripts/validate-skill.mjs"
+  )
     continue;
   const content = await text(file);
   const prohibited = prohibitedText.find((value) => content.includes(value));
   if (prohibited)
     throw new Error(
-      `Prohibited private-repository reference in ${file}: ${prohibited}`,
+      `Prohibited private-repository reference in ${portableFile}: ${prohibited}`,
     );
   if (/\btk_(?:live|test)_[A-Za-z0-9_-]{32,96}\b/u.test(content)) {
-    throw new Error(`Credential-like value found in ${file}.`);
+    throw new Error(`Credential-like value found in ${portableFile}.`);
   }
 }
 
