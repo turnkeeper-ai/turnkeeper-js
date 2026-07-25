@@ -28,6 +28,8 @@ The tag starts `.github/workflows/release.yml`. The workflow:
 - installs all three exact versions into a clean temporary project and verifies SDK import, CLI
   execution, MCP stdio startup, npm signatures, SLSA provenance, and the `next` dist-tag;
 - attaches the identical tarballs, versioned schemas, SBOMs, and checksums to a GitHub prerelease.
+- creates or refreshes one unpublished changelog draft through the hosted platform only after all
+  package, provenance, consumer, and GitHub prerelease checks succeed.
 
 Prereleases are published under the npm `next` tag. Moving a version to `latest` is a separate,
 reviewed decision after compatibility and installation evidence is complete.
@@ -54,6 +56,11 @@ Configure trusted publishing for all three packages:
 
 The release job intentionally has `id-token: write` and does not use an npm token. Do not add
 `NPM_TOKEN` or `NODE_AUTH_TOKEN` secrets to this workflow.
+
+The same short-lived GitHub Actions OIDC identity authenticates changelog draft creation. The
+hosted endpoint accepts only the `turnkeeper-ai/turnkeeper-js` release workflow, validates the
+exact tag and canonical GitHub release URL, and always writes `status: draft`. There is no
+changelog automation secret and the workflow cannot publish a note.
 
 Also configure the repository to:
 
@@ -110,7 +117,8 @@ npm audit signatures
 
 The GitHub release must be marked as a prerelease and contain the three `.tgz` files, three SBOMs,
 the three versioned JSON Schemas, and `SHA256SUMS`. Each package's `next` dist-tag must equal the
-released version.
+released version. The workflow must also report that it created or updated the matching hosted
+changelog draft. An authenticated Turnkeeper operator reviews and publishes that draft separately.
 
 ## Recovery and prohibited paths
 
@@ -125,6 +133,12 @@ annotated tag in `release_tag`. The recovery run checks out that tag, rebuilds i
 uses the same integrity and provenance gates before creating or verifying the prerelease. Never
 move a tag after any package for that version has reached the registry. Manual recovery runs fail
 instead of publishing if any package in the release is missing.
+
+The changelog draft uses the release tag as its deterministic source identity. Rerunning the same
+verified release updates the same draft instead of creating a duplicate. If the hosted changelog
+endpoint is temporarily unavailable, fix the endpoint or workflow and rerun recovery with the
+same tag; do not create a second note or weaken the release checks. A draft that has already been
+published is immutable to this automation and causes a hard failure that requires operator review.
 
 Do not manually upload a tarball built from an uncommitted worktree, publish only one dependent
 package, reuse a published version, move `latest` as part of an alpha release, replace a release
