@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 const CHANGELOG_AUDIENCE = "turnkeeper-changelog";
 const CHANGELOG_ENDPOINT = "https://turnkeeper.ai/api/internal/changelog/drafts";
 const RELEASE_TAG = /^v\d+\.\d+\.\d+-[0-9A-Za-z.-]+$/u;
+const GITHUB_ACTIONS_REQUEST_HOST = /^[a-z0-9-]+\.actions\.githubusercontent\.com$/u;
 
 function required(env, key, maxLength = 24_000) {
   const value = typeof env[key] === "string" ? env[key].trim() : "";
@@ -33,7 +34,7 @@ async function requestGitHubOidcToken({ env, fetchImpl }) {
   const requestUrl = new URL(required(env, "ACTIONS_ID_TOKEN_REQUEST_URL", 4_096));
   if (
     requestUrl.protocol !== "https:" ||
-    requestUrl.hostname !== "pipelines.actions.githubusercontent.com"
+    !GITHUB_ACTIONS_REQUEST_HOST.test(requestUrl.hostname)
   ) {
     throw new Error("GitHub OIDC request URL is not trusted.");
   }
