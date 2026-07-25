@@ -1,5 +1,11 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  rm,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -43,21 +49,17 @@ test("inspection is bounded, skips secret-like files, and reports heuristic bypa
   }
 });
 
-test("inspection refuses a symlink root", async (context) => {
-  if (process.platform === "win32") {
-    context.skip(
-      "symlink creation requires platform-specific privileges on Windows",
-    );
-    return;
-  }
-
+test("inspection refuses a linked directory root", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "turnkeeper-cli-symlink-"));
   const target = path.join(root, "target");
   const link = path.join(root, "link");
   try {
-    const { mkdir, symlink } = await import("node:fs/promises");
     await mkdir(target);
-    await symlink(target, link);
+    await symlink(
+      target,
+      link,
+      process.platform === "win32" ? "junction" : "dir",
+    );
     await assert.rejects(inspectIntegration(link), /non-symlink directory/u);
   } finally {
     await rm(root, { force: true, recursive: true });

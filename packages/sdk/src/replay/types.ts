@@ -1,3 +1,5 @@
+import type { TurnkeeperValidationIssue } from "../errors.js";
+
 export const REPLAY_API_VERSION = "2026-07-09" as const;
 
 export const REPLAY_EVENT_TYPES = [
@@ -71,10 +73,7 @@ export interface ReplayBatch {
   readonly events: readonly ReplayEvent[];
 }
 
-export interface ReplayValidationIssue {
-  readonly path: string;
-  readonly code: string;
-}
+export type ReplayValidationIssue = TurnkeeperValidationIssue;
 
 export interface ReplayEnvelopeValidationFailure {
   readonly ok: false;

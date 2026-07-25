@@ -10,7 +10,7 @@ Its policy simulation is development-time evidence, not production authorization
 ## Install
 
 ```sh
-npm install --save-dev @turnkeeper/cli
+npm install --save-dev @turnkeeper/cli@0.1.0-alpha.4
 ```
 
 Run it through the local package binary:

@@ -59,6 +59,7 @@ test("validation errors do not echo unsafe values", () => {
     () => assertValidReplayBatch({ events: [{ ...replayEvent(), data: { reason_code: canary } }] }, { now: NOW }),
     (error: unknown) => {
       assert.ok(error instanceof TurnkeeperValidationError);
+      assert.equal(error.code, "invalid_replay_input");
       assert.equal(JSON.stringify(error).includes(canary), false);
       return true;
     },

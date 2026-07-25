@@ -34,8 +34,11 @@ export interface JsonTransport {
   requestJson(path: string, options: JsonRequestOptions): Promise<unknown>;
 }
 
-function validation(code: string): never {
-  throw new TurnkeeperValidationError([{ path: "$", code }]);
+function configurationValidation(path: string, code: string): never {
+  throw new TurnkeeperValidationError(
+    [{ path, code }],
+    "client_configuration",
+  );
 }
 
 function normalizeBaseUrl(value: string): string {
@@ -43,19 +46,19 @@ function normalizeBaseUrl(value: string): string {
   try {
     url = new URL(value);
   } catch {
-    return validation("invalid_base_url");
+    return configurationValidation("$.baseUrl", "invalid_base_url");
   }
   if (url.username || url.password || url.search || url.hash)
-    return validation("invalid_base_url");
+    return configurationValidation("$.baseUrl", "invalid_base_url");
   if (url.pathname !== "/" && url.pathname !== "")
-    return validation("invalid_base_url");
+    return configurationValidation("$.baseUrl", "invalid_base_url");
   const local =
     url.hostname === "localhost" ||
     url.hostname === "127.0.0.1" ||
     url.hostname === "[::1]" ||
     url.hostname === "::1";
   if (url.protocol !== "https:" && !(local && url.protocol === "http:"))
-    return validation("insecure_base_url");
+    return configurationValidation("$.baseUrl", "insecure_base_url");
   return url.origin;
 }
 
@@ -169,13 +172,15 @@ async function boundedJson(response: Response): Promise<unknown> {
 export function createTransport(
   options: TurnkeeperTransportOptions,
 ): JsonTransport {
-  if (!API_KEY_RE.test(options.apiKey)) return validation("invalid_api_key");
+  if (!API_KEY_RE.test(options.apiKey))
+    return configurationValidation("$.apiKey", "invalid_api_key");
   const baseUrl = normalizeBaseUrl(options.baseUrl);
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 120_000)
-    return validation("invalid_timeout");
+    return configurationValidation("$.timeoutMs", "invalid_timeout");
   const fetchImpl = options.fetch ?? globalThis.fetch;
-  if (typeof fetchImpl !== "function") return validation("fetch_unavailable");
+  if (typeof fetchImpl !== "function")
+    return configurationValidation("$.fetch", "fetch_unavailable");
   const apiKey = options.apiKey;
 
   return {

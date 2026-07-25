@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   ACTION_CONTEXT_SCHEMA_VERSION,
   ControlClient,
+  GovernanceInputError,
   TurnkeeperProtocolError,
   canonicalSHA256,
   createActionBinding,
@@ -51,6 +52,79 @@ function action(overrides: Partial<ActionContext> = {}): ActionContext {
     ...overrides,
   };
 }
+
+test("policy generation reports sanitized field-level input issues", () => {
+  assert.throws(
+    () => {
+      // @ts-expect-error -- Runtime JavaScript callers can omit required fields.
+      return generatePolicy({
+        actionName: "issue_refund",
+        allowedRoles: ["support_agent"],
+        approvalRequired: true,
+        parameterRestrictions: [],
+        requiredConditions: [],
+      });
+    },
+    (error: unknown) => {
+      assert.ok(error instanceof GovernanceInputError);
+      assert.equal(error.code, "invalid_policy_generation_input");
+      assert.deepEqual(error.issues, [
+        { path: "$.riskLevel", code: "invalid_value" },
+      ]);
+      return true;
+    },
+  );
+
+  const canary = "api_key_synthetic_canary";
+  assert.throws(
+    () =>
+      generatePolicy({
+        actionName: "issue_refund",
+        allowedRoles: ["support_agent"],
+        approvalRequired: true,
+        parameterRestrictions: [],
+        requiredConditions: [
+          {
+            operator: "exists",
+            signalKey: canary,
+            valueType: "string",
+          },
+        ],
+        riskLevel: "high",
+      }),
+    (error: unknown) => {
+      assert.ok(error instanceof GovernanceInputError);
+      assert.deepEqual(error.issues, [
+        {
+          path: "$.requiredConditions[0].signalKey",
+          code: "unsafe_signal_key",
+        },
+      ]);
+      assert.equal(JSON.stringify(error).includes(canary), false);
+      return true;
+    },
+  );
+});
+
+test("semantic policy generation errors retain their operation-specific codes", () => {
+  assert.throws(
+    () =>
+      generatePolicy({
+        actionName: "issue_refund",
+        allowedRoles: ["support_agent"],
+        approvalRequired: false,
+        parameterRestrictions: [],
+        requiredConditions: [],
+        riskLevel: "high",
+      }),
+    (error: unknown) => {
+      assert.ok(error instanceof GovernanceInputError);
+      assert.equal(error.code, "high_risk_requires_approval");
+      assert.deepEqual(error.issues, []);
+      return true;
+    },
+  );
+});
 
 test("high-risk conditional policies review matching actions and block the fallback", () => {
   const policy = bundle();

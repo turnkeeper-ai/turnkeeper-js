@@ -9,6 +9,8 @@ export {
   type RetryDecision,
   type TurnkeeperErrorKind,
   type TurnkeeperTransportCode,
+  type TurnkeeperValidationContext,
+  type TurnkeeperValidationIssue,
 } from "./errors.js";
 export type { ReplayOperations } from "./replay/client.js";
 export {

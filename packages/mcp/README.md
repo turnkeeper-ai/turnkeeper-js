@@ -5,6 +5,10 @@ development tools. It generates and validates bounded policies, returns starter 
 guidance, creates scaffold plans, generates tests, simulates development-time decisions, and
 heuristically inspects source code.
 
+During Turnkeeper's alpha, the server exact-pins the official split MCP v2 beta packages. The
+stdio boundary accepts a v1-compatible 2025 client handshake, while tool-schema metadata may
+continue to evolve before the MCP v2 packages become stable.
+
 It never executes refunds, bookings, account changes, provider tools, or any other real-world
 action. Simulation is not production authorization.
 

@@ -1,7 +1,11 @@
-import type { ReplayValidationIssue } from "./replay/types.js";
-
 export type TurnkeeperErrorKind = "validation" | "api" | "transport" | "protocol";
 export type TurnkeeperTransportCode = "network_error" | "request_timeout" | "request_aborted";
+export type TurnkeeperValidationContext = "client_configuration" | "replay_input";
+
+export interface TurnkeeperValidationIssue {
+  readonly path: string;
+  readonly code: string;
+}
 
 export interface RetryDecision {
   readonly retry: boolean;
@@ -39,13 +43,24 @@ export class TurnkeeperError extends Error {
 }
 
 export class TurnkeeperValidationError extends TurnkeeperError {
-  readonly issues: readonly ReplayValidationIssue[];
+  readonly issues: readonly TurnkeeperValidationIssue[];
 
-  constructor(issues: readonly ReplayValidationIssue[]) {
-    super("Replay input failed local validation.", {
-      code: "invalid_replay_input",
-      kind: "validation",
-    });
+  constructor(
+    issues: readonly TurnkeeperValidationIssue[],
+    context: TurnkeeperValidationContext = "replay_input",
+  ) {
+    super(
+      context === "client_configuration"
+        ? "Turnkeeper client configuration failed local validation."
+        : "Replay input failed local validation.",
+      {
+        code:
+          context === "client_configuration"
+            ? "invalid_client_configuration"
+            : "invalid_replay_input",
+        kind: "validation",
+      },
+    );
     this.name = "TurnkeeperValidationError";
     this.issues = issues.map(({ path, code }) => ({ path, code }));
   }
