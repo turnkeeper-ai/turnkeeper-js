@@ -304,5 +304,14 @@ jobs:
             --title "${RELEASE_TAG}" \
             --verify-tag
 
+      - name: Check out the changelog client
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+          path: .changelog-automation
+          sparse-checkout: scripts/changelogDraftClient.mjs
+          sparse-checkout-cone-mode: false
+
       - name: Create or refresh the hosted changelog draft
-        run: node scripts/changelogDraftClient.mjs
+        run: node .changelog-automation/scripts/changelogDraftClient.mjs
