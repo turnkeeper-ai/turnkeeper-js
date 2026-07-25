@@ -5,6 +5,17 @@ Server-side TypeScript SDK for Turnkeeper Replay and bounded Control checks.
 The package is ESM-only and supports Node.js 22.20 and Node.js 24. Keep project API keys and action
 binding secrets in a server-side secret manager.
 
+## Install
+
+Pin the current alpha explicitly because npm's unversioned `latest` channel still resolves to
+`0.1.0-alpha.2`:
+
+```sh
+npm install @turnkeeper/sdk@0.1.0-alpha.5
+```
+
+Use `@turnkeeper/sdk@next` only when intentionally tracking the moving prerelease channel.
+
 ## Replay
 
 Replay records metadata-only lifecycle events. Never send prompts, completions, transcripts,

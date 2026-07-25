@@ -5,6 +5,13 @@ import process from "node:process";
 const root = process.cwd();
 const version = "0.1.0-alpha.5";
 const packageDirectories = ["packages/sdk", "packages/cli", "packages/mcp"];
+const installationGuides = [
+  ["README.md", "@turnkeeper/sdk"],
+  ["packages/sdk/README.md", "@turnkeeper/sdk"],
+  ["packages/cli/README.md", "@turnkeeper/cli"],
+  ["packages/mcp/README.md", "@turnkeeper/mcp"],
+  ["docs/versioning.md", "@turnkeeper/sdk"],
+];
 const requiredPaths = [
   "LICENSE",
   "docs/control.md",
@@ -24,6 +31,7 @@ const requiredPaths = [
   "examples/customer-support-agent/package.json",
   "examples/booking-agent/package.json",
   "examples/account-management-agent/package.json",
+  ".github/ISSUE_TEMPLATE/bug.yml",
 ];
 const prohibitedText = [
   "@turnkeeper/agent-toolkit",
@@ -38,6 +46,17 @@ async function text(file) {
 }
 
 for (const file of requiredPaths) await text(file);
+
+for (const [file, packageName] of installationGuides) {
+  const guide = await text(file);
+  if (!guide.includes(`${packageName}@${version}`)) {
+    throw new Error(`${file} must pin ${packageName}@${version}.`);
+  }
+}
+
+if (!(await text(".github/ISSUE_TEMPLATE/bug.yml")).includes(version)) {
+  throw new Error(`Bug reports must prompt for the current alpha ${version}.`);
+}
 
 const skill = (await text("skills/turnkeeper-agent-builder/SKILL.md")).replace(
   /\r\n?/gu,

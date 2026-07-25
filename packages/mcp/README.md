@@ -14,7 +14,16 @@ action. Simulation is not production authorization.
 
 ## Run
 
-Build the monorepo, then start the server with an explicit workspace boundary:
+Run the exact current alpha from npm. The unversioned `latest` channel still resolves to
+`0.1.0-alpha.2`; use `@turnkeeper/mcp@next` only to follow the moving prerelease channel.
+
+```sh
+export TURNKEEPER_WORKSPACE_ROOT=/absolute/path/to/your/project
+npx -y @turnkeeper/mcp@0.1.0-alpha.5
+```
+
+When working from this monorepo, build first and then start the local package binary with an
+explicit workspace boundary:
 
 ```sh
 export TURNKEEPER_WORKSPACE_ROOT=/absolute/path/to/your/project
