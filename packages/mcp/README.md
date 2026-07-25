@@ -21,20 +21,20 @@ export TURNKEEPER_WORKSPACE_ROOT=/absolute/path/to/your/project
 turnkeeper-mcp
 ```
 
-Host-neutral MCP configuration shape (**unverified in external clients**):
+Portable stdio process settings (**unverified in external clients**):
 
 ```json
 {
-  "mcpServers": {
-    "turnkeeper": {
-      "command": "turnkeeper-mcp",
-      "env": {
-        "TURNKEEPER_WORKSPACE_ROOT": "/absolute/path/to/your/project"
-      }
-    }
+  "command": "turnkeeper-mcp",
+  "env": {
+    "TURNKEEPER_WORKSPACE_ROOT": "/absolute/path/to/your/project"
   }
 }
 ```
+
+Adapt these process settings to the outer schema and configuration location documented by the
+specific MCP host. The repository does not claim that this fragment is a complete client
+configuration.
 
 The server refuses to start without `TURNKEEPER_WORKSPACE_ROOT`. Inspection accepts only relative
 paths whose real paths remain beneath that root. Symlinks are not followed, and traversal is
@@ -62,4 +62,5 @@ echoes a production binding secret. Its action binding cannot authorize a runtim
 integration and ensure all side effects remain behind one authenticated, server-side executor.
 
 For the current client verification matrix, shared stdio requirements, read-only tool-discovery
-check, and troubleshooting steps, see [Turnkeeper MCP documentation](../../docs/mcp.md).
+check, and troubleshooting steps, see the canonical [Turnkeeper MCP
+documentation](https://github.com/turnkeeper-ai/turnkeeper-js/blob/main/docs/mcp.md).

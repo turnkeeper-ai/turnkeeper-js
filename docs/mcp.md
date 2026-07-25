@@ -14,21 +14,21 @@ After the alpha package is published:
 TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.5
 ```
 
-Host-neutral MCP configuration shape (**unverified in external clients**):
+Portable stdio process settings (**unverified in external clients**):
 
 ```json
 {
-  "mcpServers": {
-    "turnkeeper": {
-      "command": "npx",
-      "args": ["-y", "@turnkeeper/mcp@0.1.0-alpha.5"],
-      "env": {
-        "TURNKEEPER_WORKSPACE_ROOT": "/absolute/path/to/your/project"
-      }
-    }
+  "command": "npx",
+  "args": ["-y", "@turnkeeper/mcp@0.1.0-alpha.5"],
+  "env": {
+    "TURNKEEPER_WORKSPACE_ROOT": "/absolute/path/to/your/project"
   }
 }
 ```
+
+Adapt these process settings to the outer schema and configuration location documented by the
+specific MCP host. The repository does not claim that this fragment is a complete client
+configuration.
 
 ## Client setup matrix
 
@@ -46,13 +46,14 @@ table deliberately avoids claiming support or publishing client-specific JSON.
 
 All stdio hosts have the same runtime requirements:
 
-- Run the published package with `npx -y @turnkeeper/mcp@0.1.0-alpha.4`, or build this monorepo and
+- Run the published package with `npx -y @turnkeeper/mcp@0.1.0-alpha.5`, or build this monorepo and
   run `turnkeeper-mcp` from the package binary.
 - Set `TURNKEEPER_WORKSPACE_ROOT` to an absolute, trusted project directory. Relative inspection
   paths are resolved beneath that boundary; the process does not require a particular current
   working directory when the environment variable is absolute.
 - Keep stdout exclusively for MCP protocol messages. Send wrapper diagnostics to stderr.
-- Use synthetic project content and do not add credentials to the MCP environment.
+- Run against trusted development source, use synthetic example values, and do not add credentials
+  to the MCP environment.
 
 ## Confirm tool discovery
 
