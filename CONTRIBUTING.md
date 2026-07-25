@@ -56,15 +56,15 @@ repository; this map does not add or rename any package script.
 | Area you changed | Nearest focused command |
 | --- | --- |
 | SDK (`packages/sdk`) | `npm run typecheck --workspace @turnkeeper/sdk` then `npm run test --workspace @turnkeeper/sdk` and `npm run package:check --workspace @turnkeeper/sdk` |
-| CLI (`packages/cli`) | `npm run test --workspace @turnkeeper/cli` (or `npm run check --workspace @turnkeeper/cli` for build + typecheck + test + package check) |
-| MCP server (`packages/mcp`) | `npm run test --workspace @turnkeeper/mcp` (or `npm run check --workspace @turnkeeper/mcp` for build + typecheck + test + package check) |
+| CLI (`packages/cli`) | `npm run check --workspace @turnkeeper/cli` (typecheck + test; test builds), then `npm run package:check --workspace @turnkeeper/cli` for package contents |
+| MCP server (`packages/mcp`) | `npm run check --workspace @turnkeeper/mcp` (typecheck + test; test builds), then `npm run package:check --workspace @turnkeeper/mcp` for package contents |
 | Example: account-management-agent | `npm run test --workspace @turnkeeper/example-account-management-agent` |
 | Example: booking-agent | `npm run test --workspace @turnkeeper/example-booking-agent` |
 | Example: customer-support-agent | `npm run test --workspace @turnkeeper/example-customer-support-agent` |
 | Example: durable-outbox-worker | Docs-only example (`examples/durable-outbox-worker/README.md`); no package script — rely on `npm run check` |
 | Agent-builder skill (`skills/turnkeeper-agent-builder`) | `node scripts/validate-skill.mjs` |
 | Package contents (any published package) | `npm run smoke:packages` (or `npm run package:check --workspaces --if-present`) |
-| Documentation / skill-only changes | No package script; confirm links and formatting, then run `npm run check` |
+| Documentation-only changes | No focused package script; confirm links and formatting, then run `npm run check` |
 
 Focused commands speed up iteration but do not replace the gate. `npm run check` remains the
 required final command before review — it runs build, workspace typecheck, workspace tests,
