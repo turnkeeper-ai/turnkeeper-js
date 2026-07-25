@@ -289,10 +289,17 @@ jobs:
             diff -u \
               <(find release-artifacts -maxdepth 1 -type f -printf '%f\n' | sort) \
               <(find "${download_dir}" -maxdepth 1 -type f -printf '%f\n' | sort)
+            (
+              cd "${download_dir}"
+              sha256sum --check SHA256SUMS
+            )
             for artifact in release-artifacts/*; do
+              case "$(basename "${artifact}")" in
+                SHA256SUMS|*.cdx.json) continue ;;
+              esac
               cmp --silent "${artifact}" "${download_dir}/$(basename "${artifact}")"
             done
-            echo "Verified the existing immutable GitHub prerelease."
+            echo "Verified the existing immutable GitHub prerelease and its checksum manifest."
             exit 0
           fi
 
