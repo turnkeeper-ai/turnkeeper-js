@@ -47,6 +47,34 @@ npm run check
 Include the command and result in the pull request. If a check cannot run, explain exactly why and
 what remains unverified.
 
+### Focused contributor command map
+
+Use the nearest focused command for the area you changed while iterating, then run the required
+`npm run check` gate before requesting review. Every command below already exists in this
+repository; this map does not add or rename any package script.
+
+| Area you changed | Nearest focused command |
+| --- | --- |
+| SDK (`packages/sdk`) | `npm run typecheck --workspace @turnkeeper/sdk` then `npm run test --workspace @turnkeeper/sdk` and `npm run package:check --workspace @turnkeeper/sdk` |
+| CLI (`packages/cli`) | `npm run check --workspace @turnkeeper/cli` (typecheck + test; test builds), then `npm run package:check --workspace @turnkeeper/cli` for package contents |
+| MCP server (`packages/mcp`) | `npm run check --workspace @turnkeeper/mcp` (typecheck + test; test builds), then `npm run package:check --workspace @turnkeeper/mcp` for package contents |
+| Example: account-management-agent | `npm run test --workspace @turnkeeper/example-account-management-agent` |
+| Example: booking-agent | `npm run test --workspace @turnkeeper/example-booking-agent` |
+| Example: customer-support-agent | `npm run test --workspace @turnkeeper/example-customer-support-agent` |
+| Example: durable-outbox-worker | Docs-only example (`examples/durable-outbox-worker/README.md`); no package script — rely on `npm run check` |
+| Agent-builder skill (`skills/turnkeeper-agent-builder`) | `node scripts/validate-skill.mjs` |
+| Package contents (any published package) | `npm run smoke:packages` (or `npm run package:check --workspaces --if-present`) |
+| Documentation-only changes | No focused package script; confirm links and formatting, then run `npm run check` |
+
+Focused commands speed up iteration but do not replace the gate. `npm run check` remains the
+required final command before review — it runs build, workspace typecheck, workspace tests,
+package-content checks, `npm run smoke:packages`, and `node scripts/validate-skill.mjs`.
+
+Use Node.js 22.20 or Node.js 24 and npm 11 for both focused commands and the gate.
+
+On Windows, the CLI and MCP package tests exercise link-boundary behavior using directory
+junctions, so they run without Developer Mode or administrator-only symbolic-link privileges.
+
 ### Environment troubleshooting
 
 Confirm the active runtime before investigating an install or native dependency failure:
