@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0-alpha.5 - 2026-07-25
+
 - Replace the monolithic MCP SDK with exact-pinned split v2 beta server and test-client packages,
   removing known dependency advisories while preserving the local stdio-only boundary and stable
   v1-compatible 2025 client handshake.

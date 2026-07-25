@@ -7,7 +7,7 @@ const manifest = JSON.parse(
 );
 if (
   manifest.name !== "@turnkeeper/mcp" ||
-  manifest.version !== "0.1.0-alpha.4"
+  manifest.version !== "0.1.0-alpha.5"
 ) {
   throw new Error("MCP package identity is not release-aligned.");
 }
@@ -15,8 +15,8 @@ if (manifest.license !== "Apache-2.0" || manifest.private === true) {
   throw new Error("MCP package must remain public and Apache-2.0 licensed.");
 }
 if (
-  manifest.dependencies?.["@turnkeeper/sdk"] !== "0.1.0-alpha.4" ||
-  manifest.dependencies?.["@turnkeeper/cli"] !== "0.1.0-alpha.4"
+  manifest.dependencies?.["@turnkeeper/sdk"] !== "0.1.0-alpha.5" ||
+  manifest.dependencies?.["@turnkeeper/cli"] !== "0.1.0-alpha.5"
 ) {
   throw new Error(
     "MCP package must use exact release-aligned Turnkeeper dependencies.",

@@ -63,7 +63,7 @@ function additiveScaffold(projectName: string) {
           {
             ...file,
             content:
-              "Install the SDK in the host project first: `npm install @turnkeeper/sdk@0.1.0-alpha.4`.\n\n" +
+              "Install the SDK in the host project first: `npm install @turnkeeper/sdk@0.1.0-alpha.5`.\n\n" +
               file.content,
             path: "turnkeeper/README.md",
           },
