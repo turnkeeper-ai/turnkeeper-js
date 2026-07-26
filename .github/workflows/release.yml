@@ -16,12 +16,14 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  id-token: write
+  contents: read
 
 jobs:
   release:
     if: github.repository == 'turnkeeper-ai/turnkeeper-js'
+    permissions:
+      contents: write
+      id-token: write
     runs-on: ubuntu-latest
     timeout-minutes: 90
     environment: npm-release
