@@ -270,29 +270,39 @@ export const SCENARIOS: readonly ScenarioFixture[] = Object.freeze([
   },
 ]);
 
-function buildActionContext(
+export function buildActionContext(
   proposal: SupportRefundProposal,
   signals: SupportRefundSignals,
   actorRoles: string[],
+  options: {
+    conversationId?: string;
+    environment?: ActionContext["environment"];
+    projectId?: string;
+    proposalVersion?: number;
+    tenantId?: string;
+    turnId?: string;
+    userId?: string;
+    actorId?: string;
+  } = {},
 ): ActionContext {
   return {
     actionName: SUPPORT_REFUND_ACTION,
-    actorId: "actor_fs_demo",
+    actorId: options.actorId ?? "actor_fs_demo",
     actorRoles,
-    conversationId: "conversation_fs_demo",
-    environment: "test",
+    conversationId: options.conversationId ?? "conversation_fs_demo",
+    environment: options.environment ?? "test",
     parameters: {
       amount_cents: proposal.amountCents,
       customer_ref: proposal.customerRef,
       transaction_ref: proposal.transactionRef,
     },
-    projectId: "project_fs_demo",
-    proposalVersion: 1,
+    projectId: options.projectId ?? "project_fs_demo",
+    proposalVersion: options.proposalVersion ?? 1,
     schemaVersion: ACTION_CONTEXT_SCHEMA_VERSION,
     signals,
-    tenantId: "tenant_fs_demo",
-    turnId: "turn_fs_demo",
-    userId: "subject_fs_demo",
+    tenantId: options.tenantId ?? "tenant_fs_demo",
+    turnId: options.turnId ?? "turn_fs_demo",
+    userId: options.userId ?? "subject_fs_demo",
   };
 }
 
