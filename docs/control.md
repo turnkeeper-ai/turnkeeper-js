@@ -35,8 +35,10 @@ correlation for requests that reach the server.
     action.
 11. Record the downstream outcome and enqueue metadata-only Replay evidence.
 
-For a complete `support.refund` local simulation and hosted integration sketch, see
-[`examples/financial-services-refund`](../examples/financial-services-refund).
+For complete local simulations and hosted integration sketches, see
+[`examples/financial-services-refund`](../examples/financial-services-refund),
+[`examples/support-escalation`](../examples/support-escalation), and
+[`examples/account-contact-change`](../examples/account-contact-change).
 
 ## Review completion
 
