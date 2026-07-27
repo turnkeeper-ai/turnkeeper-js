@@ -1,5 +1,5 @@
 {
-  "name": "@turnkeeper/example-account-management-agent",
+  "name": "@turnkeeper/example-self-hosted-safeguard",
   "version": "0.1.0-alpha.7",
   "private": true,
   "type": "module",
@@ -8,7 +8,8 @@
   },
   "scripts": {
     "demo": "node --import tsx src/index.ts",
-    "test": "node --import tsx --test test/*.test.ts"
+    "test": "node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@turnkeeper/sdk": "0.1.0-alpha.7"

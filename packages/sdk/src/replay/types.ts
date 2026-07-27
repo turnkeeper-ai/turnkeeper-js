@@ -1,6 +1,6 @@
 import type { TurnkeeperValidationIssue } from "../errors.js";
 
-export const REPLAY_API_VERSION = "2026-07-09" as const;
+export const REPLAY_API_VERSION = "2026-07-27" as const;
 
 export const REPLAY_EVENT_TYPES = [
   "input.received",
@@ -22,7 +22,7 @@ export type OpaqueReplayId = string & { readonly [opaqueReplayIdBrand]: true };
 export type ReplayEventType = (typeof REPLAY_EVENT_TYPES)[number];
 export type ReplayBotType = "seller" | "buyer";
 export type ReplayChannel = "sms" | "webhook" | "simulator";
-export type ReplayProvider = "anthropic";
+export type ReplayProvider = "anthropic" | "self_hosted";
 export type ReplayDeliveryState = "queued" | "held" | "sent" | "failed" | "none";
 
 export interface ReplayEventData {

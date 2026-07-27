@@ -23,7 +23,7 @@ import {
   type WorkspaceBoundaryCode,
 } from "./workspace.js";
 
-const VERSION = "0.1.0-alpha.6";
+const VERSION = "0.1.0-alpha.7";
 
 const AgentTypeSchema = z.enum([
   "anthropic-compatible",

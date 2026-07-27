@@ -11,7 +11,7 @@ Pin the current alpha explicitly because npm's unversioned `latest` channel stil
 `0.1.0-alpha.2`:
 
 ```sh
-npm install @turnkeeper/sdk@0.1.0-alpha.6
+npm install @turnkeeper/sdk@0.1.0-alpha.7
 ```
 
 Use `@turnkeeper/sdk@next` only when intentionally tracking the moving prerelease channel.

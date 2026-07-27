@@ -14,7 +14,7 @@ import {
 import { NOW, replayBatch, replayEvent } from "./helpers.js";
 
 test("exports the exact preview Replay contract", () => {
-  assert.equal(REPLAY_API_VERSION, "2026-07-09");
+  assert.equal(REPLAY_API_VERSION, "2026-07-27");
   assert.deepEqual(REPLAY_EVENT_TYPES, [
     "input.received",
     "turn.started",
@@ -103,6 +103,39 @@ test("rejects PII, URLs, and credential-shaped values in every free code field",
     assert.equal(result.ok && result.events[0]?.ok, false);
     assert.equal(JSON.stringify(result).includes(canary), false);
   }
+});
+
+test("accepts anthropic and self_hosted providers and rejects unknown values", () => {
+  for (const provider of ["anthropic", "self_hosted"] as const) {
+    const result = validateReplayBatch(
+      { events: [replayEvent({ data: { ...replayEvent().data, provider } })] },
+      { now: NOW, retentionDays: 30 },
+    );
+    assert.equal(result.ok && result.events[0]?.ok, true, provider);
+  }
+
+  for (const provider of ["openai", "vllm", "self-hosted"]) {
+    const event = {
+      ...replayEvent(),
+      data: { ...replayEvent().data, provider },
+    };
+    const result = validateReplayBatch({ events: [event] }, { now: NOW, retentionDays: 30 });
+    assert.equal(result.ok && result.events[0]?.ok, false, provider);
+  }
+});
+
+test("rejects oversized model identifiers", () => {
+  const result = validateReplayBatch(
+    {
+      events: [
+        replayEvent({
+          data: { ...replayEvent().data, model: `model.${"x".repeat(120)}` },
+        }),
+      ],
+    },
+    { now: NOW, retentionDays: 30 },
+  );
+  assert.equal(result.ok && result.events[0]?.ok, false);
 });
 
 test("enforces timestamp and identifier boundaries", () => {

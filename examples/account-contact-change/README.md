@@ -44,4 +44,4 @@ npm run typecheck
 Turnkeeper does **not** execute contact changes. `audit` is observational evidence,
 not authorization to mutate the account.
 
-Install `@turnkeeper/cli@0.1.0-alpha.6` for policy validation helpers.
+Install `@turnkeeper/cli@0.1.0-alpha.7` for policy validation helpers.

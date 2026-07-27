@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 
 const root = process.cwd();
-const version = "0.1.0-alpha.6";
+const version = "0.1.0-alpha.7";
 const packageDirectories = ["packages/sdk", "packages/cli", "packages/mcp"];
 const exampleDirectories = [
   "examples/customer-support-agent",
@@ -12,6 +12,7 @@ const exampleDirectories = [
   "examples/financial-services-refund",
   "examples/support-escalation",
   "examples/account-contact-change",
+  "examples/self-hosted-safeguard",
 ];
 const installationGuides = [
   ["README.md", "@turnkeeper/sdk"],
@@ -25,6 +26,7 @@ const installationGuides = [
   ["examples/financial-services-refund/README.md", "@turnkeeper/cli"],
   ["examples/support-escalation/README.md", "@turnkeeper/cli"],
   ["examples/account-contact-change/README.md", "@turnkeeper/cli"],
+  ["examples/self-hosted-safeguard/README.md", "@turnkeeper/cli"],
   ["docs/versioning.md", "@turnkeeper/sdk"],
 ];
 const versionReferences = [
@@ -50,6 +52,7 @@ const requiredPaths = [
   "spec/control-check-request-2026-07-16.schema.json",
   "spec/control-check-response-2026-07-16.schema.json",
   "spec/replay-2026-07-09.schema.json",
+  "spec/replay-2026-07-27.schema.json",
   "skills/turnkeeper-agent-builder/SKILL.md",
   "skills/turnkeeper-agent-builder/agents/openai.yaml",
   "skills/turnkeeper-agent-builder/references/public-packages.md",
@@ -62,6 +65,7 @@ const requiredPaths = [
   "examples/financial-services-refund/package.json",
   "examples/support-escalation/package.json",
   "examples/account-contact-change/package.json",
+  "examples/self-hosted-safeguard/package.json",
   ".github/ISSUE_TEMPLATE/bug.yml",
 ];
 const prohibitedText = [
@@ -166,7 +170,7 @@ if (
   throw new Error("@turnkeeper/mcp must pin matching SDK and CLI versions.");
 }
 
-const schema = JSON.parse(await text("spec/replay-2026-07-09.schema.json"));
+const schema = JSON.parse(await text("spec/replay-2026-07-27.schema.json"));
 const replayTypes = await text("packages/sdk/src/replay/types.ts");
 const schemaVersion = schema?.$defs?.event?.properties?.api_version?.const;
 if (

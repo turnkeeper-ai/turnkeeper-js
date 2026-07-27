@@ -5,7 +5,9 @@ The SDK wraps two implemented metadata-only endpoints:
 - `POST /api/v1/events/batch`
 - `GET /api/v1/events`
 
-The current dated API version is `2026-07-09`. The TypeScript types use the wire contract's snake-case names so the object inspected in application code matches the JSON transmitted to Turnkeeper.
+The current dated API version is `2026-07-27`. Provider metadata accepts `anthropic` for hosted
+Anthropic lifecycle facts and `self_hosted` when the customer operates the inference runtime.
+The TypeScript types use the wire contract's snake-case names so the object inspected in application code matches the JSON transmitted to Turnkeeper.
 
 ## Write limits
 

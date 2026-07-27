@@ -9,13 +9,20 @@ import { NOW, replayEvent } from "./helpers.js";
 
 const schema = JSON.parse(
   readFileSync(
-    new URL("../../../spec/replay-2026-07-09.schema.json", import.meta.url),
+    new URL("../../../spec/replay-2026-07-27.schema.json", import.meta.url),
     "utf8",
   ),
 ) as object;
-const validateSchema = new Ajv2020({ allErrors: true, strict: true }).compile(
-  schema,
-);
+const validateSchema = new Ajv2020({ allErrors: true, strict: true })
+  .addSchema(
+    JSON.parse(
+      readFileSync(
+        new URL("../../../spec/replay-2026-07-09.schema.json", import.meta.url),
+        "utf8",
+      ),
+    ) as object,
+  )
+  .compile(schema);
 
 function sdkAccepts(candidate: unknown): boolean {
   const result = validateReplayBatch(candidate, {
@@ -27,6 +34,31 @@ function sdkAccepts(candidate: unknown): boolean {
 
 test("published Replay JSON Schema accepts the SDK's valid synthetic contract", () => {
   const candidate = { events: [replayEvent()] };
+
+  assert.equal(
+    validateSchema(candidate),
+    true,
+    JSON.stringify(validateSchema.errors),
+  );
+  assert.equal(sdkAccepts(candidate), true);
+});
+
+test("published Replay JSON Schema accepts self_hosted provider metadata", () => {
+  const candidate = {
+    events: [
+      replayEvent({
+        type: "model.completed",
+        data: {
+          ...replayEvent().data,
+          provider: "self_hosted",
+          model: "gpt_oss.20b.support_v1",
+          input_tokens: 120,
+          output_tokens: 48,
+          latency_ms: 250,
+        },
+      }),
+    ],
+  };
 
   assert.equal(
     validateSchema(candidate),
