@@ -74,7 +74,7 @@ try {
     [
       "--input-type=module",
       "-e",
-      'import("@turnkeeper/sdk").then((module) => { if (module.REPLAY_API_VERSION !== "2026-07-09" || typeof module.ControlClient !== "function") process.exit(1); });',
+      'import("@turnkeeper/sdk").then((module) => { if (module.REPLAY_API_VERSION !== "2026-07-27" || typeof module.ControlClient !== "function") process.exit(1); });',
     ],
     sdkConsumer,
   );
@@ -90,7 +90,7 @@ try {
     [
       "--input-type=module",
       "-e",
-      'import("@turnkeeper/sdk").then((module) => { if (module.REPLAY_API_VERSION !== "2026-07-09" || typeof module.ControlClient !== "function") process.exit(1); });',
+      'import("@turnkeeper/sdk").then((module) => { if (module.REPLAY_API_VERSION !== "2026-07-27" || typeof module.ControlClient !== "function") process.exit(1); });',
     ],
     consumer,
   );

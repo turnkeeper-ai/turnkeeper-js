@@ -18,6 +18,7 @@ function schema(name: string) {
 
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 ajv.addSchema(schema("replay-2026-07-09.schema.json"));
+ajv.addSchema(schema("replay-2026-07-27.schema.json"));
 const validateRequest = ajv.compile(
   schema("control-check-request-2026-07-16.schema.json"),
 );

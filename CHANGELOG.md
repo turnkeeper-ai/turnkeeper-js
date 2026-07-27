@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.1.0-alpha.7 - 2026-07-27
+
+- Add dated Replay contract `2026-07-27` with `self_hosted` provider metadata while preserving the
+  immutable `2026-07-09` schema for historical compatibility.
+- Add `@turnkeeper/example-self-hosted-safeguard`, a provider-neutral Safeguard-to-Control and
+  Replay lifecycle walkthrough.
+- Bump synchronized workspace packages to `0.1.0-alpha.7`.
+
 ## 0.1.0-alpha.6 - 2026-07-25
 
 - Replace the host-specific MCP configuration example with a portable stdio process fragment,

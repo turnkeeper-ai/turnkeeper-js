@@ -42,7 +42,7 @@ const ISO_WITH_ZONE_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(
 const EVENT_TYPE_SET = new Set<string>(REPLAY_EVENT_TYPES);
 const BOT_TYPES = new Set(["seller", "buyer"]);
 const CHANNELS = new Set(["sms", "webhook", "simulator"]);
-const PROVIDERS = new Set(["anthropic"]);
+const PROVIDERS = new Set(["anthropic", "self_hosted"]);
 const DELIVERY_STATES = new Set(["queued", "held", "sent", "failed", "none"]);
 
 const EVENT_KEYS = new Set([

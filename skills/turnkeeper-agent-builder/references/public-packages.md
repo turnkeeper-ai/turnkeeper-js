@@ -30,9 +30,9 @@ decision before a live side effect. A simulation result is not production author
 After publication, use the CLI for local development:
 
 ```sh
-npx @turnkeeper/cli@0.1.0-alpha.6 init ./my-agent
-npx @turnkeeper/cli@0.1.0-alpha.6 validate ./my-agent/turnkeeper/policies.json
-npx @turnkeeper/cli@0.1.0-alpha.6 test-policies ./my-agent/turnkeeper/policies.json
+npx @turnkeeper/cli@0.1.0-alpha.7 init ./my-agent
+npx @turnkeeper/cli@0.1.0-alpha.7 validate ./my-agent/turnkeeper/policies.json
+npx @turnkeeper/cli@0.1.0-alpha.7 test-policies ./my-agent/turnkeeper/policies.json
 ```
 
 Review generated files before use. The CLI must not execute refunds, bookings, account changes, or
@@ -43,7 +43,7 @@ other external actions.
 After publication, run the local stdio MCP server with:
 
 ```sh
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.6
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.7
 ```
 
 Use MCP tools to obtain quickstarts, scaffold code, generate or validate policies, simulate

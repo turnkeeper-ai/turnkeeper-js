@@ -19,7 +19,7 @@ Run the exact current alpha from npm. The unversioned `latest` channel still res
 
 ```sh
 export TURNKEEPER_WORKSPACE_ROOT=/absolute/path/to/your/project
-npx -y @turnkeeper/mcp@0.1.0-alpha.6
+npx -y @turnkeeper/mcp@0.1.0-alpha.7
 ```
 
 When working from this monorepo, build first and then start the local package binary with an

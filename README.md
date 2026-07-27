@@ -34,9 +34,9 @@ for reproducible installs; the moving `next` channel is available for deliberate
 tracking.
 
 ```bash
-npm install @turnkeeper/sdk@0.1.0-alpha.6
-npm install --save-dev @turnkeeper/cli@0.1.0-alpha.6
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx -y @turnkeeper/mcp@0.1.0-alpha.6
+npm install @turnkeeper/sdk@0.1.0-alpha.7
+npm install --save-dev @turnkeeper/cli@0.1.0-alpha.7
+TURNKEEPER_WORKSPACE_ROOT="$PWD" npx -y @turnkeeper/mcp@0.1.0-alpha.7
 ```
 
 Equivalent moving-channel package specs are `@turnkeeper/sdk@next`, `@turnkeeper/cli@next`, and
@@ -64,6 +64,8 @@ See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
   bounded `support.escalation` Control contract with local fail-closed simulation
 - [`examples/account-contact-change`](examples/account-contact-change) —
   bounded `account.contact_information.change` Control contract with local fail-closed simulation
+- [`examples/self-hosted-safeguard`](examples/self-hosted-safeguard) —
+  provider-neutral Safeguard classification to `model.output.safety` Control and Replay lifecycle
 
 ## Community
 
