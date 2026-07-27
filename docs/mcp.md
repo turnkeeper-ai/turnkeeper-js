@@ -14,7 +14,7 @@ After the alpha package is published:
 TURNKEEPER_WORKSPACE_ROOT="$PWD" npx @turnkeeper/mcp@0.1.0-alpha.7
 ```
 
-Portable stdio process settings (**unverified in external clients**):
+Portable stdio process settings (host-neutral; adapt to the client's config schema):
 
 ```json
 {
@@ -32,13 +32,14 @@ configuration.
 
 ## Client setup matrix
 
-The repository currently verifies the protocol surface with the official TypeScript MCP client
-and an in-memory transport. No external desktop or editor client is maintainer-verified yet, so the
-table deliberately avoids claiming support or publishing client-specific JSON.
+The repository verifies protocol behavior with the official TypeScript MCP client (in-memory and
+stdio package smokes in `npm run check`) and one external stdio client below. Other desktop and
+editor hosts remain unverified until separately evidenced.
 
 | Client or harness | Status | Setup note |
 |---|---|---|
-| Repository MCP SDK harness | Verified in `npm run check` | Connects to `createMcpServer` and lists tools without running a business action. |
+| Repository MCP SDK harness | Verified in `npm run check` | Connects to `createMcpServer` / built `dist/bin.js` and lists tools without running a business action. |
+| MCP Inspector CLI `1.0.0` | Verified (2026-07-27) against `@turnkeeper/mcp@0.1.0-alpha.7` | See [External client evidence](#external-client-evidence-mcp-inspector-cli-100). |
 | Claude Desktop | Unverified | Adapt the host-neutral stdio shape to the client's documented config location. |
 | Cursor | Unverified | Adapt the host-neutral stdio shape; confirm its project versus user precedence first. |
 | VS Code MCP hosts | Unverified | Confirm the extension's stdio and environment schema before adding the server. |
@@ -51,16 +52,60 @@ All stdio hosts have the same runtime requirements:
 - Set `TURNKEEPER_WORKSPACE_ROOT` to an absolute, trusted project directory. Relative inspection
   paths are resolved beneath that boundary; the process does not require a particular current
   working directory when the environment variable is absolute.
-- Keep stdout exclusively for MCP protocol messages. Send wrapper diagnostics to stderr.
+- Keep stdout exclusively for MCP protocol messages. Send wrapper diagnostics to stderr. The
+  server writes its ready banner to stderr (`Turnkeeper MCP server running on stdio.`); client UIs
+  that surface process logs typically show that line there, not on stdout.
 - Run against trusted development source, use synthetic example values, and do not add credentials
   to the MCP environment.
+
+## External client evidence (MCP Inspector CLI 1.0.0)
+
+Maintainer verification used a synthetic temporary repository (no credentials, no customer content)
+and the exact published package `@turnkeeper/mcp@0.1.0-alpha.7`.
+
+Reproducible setup (placeholders only):
+
+```sh
+SYNTH_ROOT="<absolute-path-to-synthetic-project>"
+PKG_ROOT="<absolute-path-to-temp-install>"
+mkdir -p "$SYNTH_ROOT/agent"
+printf '%s\n' '# synthetic' > "$SYNTH_ROOT/agent/README.md"
+cd "$PKG_ROOT"
+npm init -y
+npm install --ignore-scripts @turnkeeper/mcp@0.1.0-alpha.7
+npx --yes @modelcontextprotocol/inspector@1.0.0 --cli \
+  "$PKG_ROOT/node_modules/@turnkeeper/mcp/dist/bin.js" \
+  --transport stdio \
+  -e TURNKEEPER_WORKSPACE_ROOT="$SYNTH_ROOT" \
+  --method tools/list
+npx --yes @modelcontextprotocol/inspector@1.0.0 --cli \
+  "$PKG_ROOT/node_modules/@turnkeeper/mcp/dist/bin.js" \
+  --transport stdio \
+  -e TURNKEEPER_WORKSPACE_ROOT="$SYNTH_ROOT" \
+  --method tools/call \
+  --tool-name get_turnkeeper_quickstart \
+  --tool-arg framework=node \
+  --tool-arg language=typescript
+```
+
+Evidence recorded:
+
+- `tools/list` returned the bounded development tool set including `get_turnkeeper_quickstart`.
+- `tools/call` on `get_turnkeeper_quickstart` returned structured guidance text without credentials.
+- Stdout remained protocol/result JSON from the Inspector CLI; the server ready banner remains on
+  stderr for hosts that expose process diagnostics.
+
+Teardown: delete `$SYNTH_ROOT` and `$PKG_ROOT`. Do not reuse those directories for customer projects.
+
+This Verified row applies only to MCP Inspector CLI `1.0.0` with `@turnkeeper/mcp@0.1.0-alpha.7`.
+Other Inspector versions and other MCP hosts stay Unverified until separately reviewed.
 
 ## Confirm tool discovery
 
 Use the client's tool-list or server-inspector view and confirm that `get_turnkeeper_quickstart`
 appears. Listing tools is read-only and does not execute a business action. In this repository,
 `npm test --workspace @turnkeeper/mcp` performs the equivalent assertion with the official MCP SDK
-client.
+client over both in-memory and stdio transports.
 
 ## Troubleshooting
 

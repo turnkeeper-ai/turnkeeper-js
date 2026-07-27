@@ -27,6 +27,14 @@ payloads, internal runbooks, or private strategy.
 
 ## Maintainer response
 
+Maintainers triage new public issues and pull requests within **7 days** on a
+best-effort basis. This is an initial-response expectation for a solo-maintained
+alpha repository, **not** an SLA for resolution, assignment, or merge.
+
+Review-ready pull requests also follow the five-business-day initial-response
+target in [CONTRIBUTING.md](CONTRIBUTING.md). Weekly status is tracked in the
+contributor response-queue issue while the first external cohort is active.
+
 Maintainers triage public reports by reproducibility, safety, compatibility impact, and alignment
 with the [public roadmap](ROADMAP.md). A report may be redirected to a discussion, closed as out of
 scope, or held until the required public server contract exists.
