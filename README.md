@@ -60,6 +60,10 @@ See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
 - [`examples/account-management-agent`](examples/account-management-agent)
 - [`examples/financial-services-refund`](examples/financial-services-refund) —
   bounded `support.refund` Control contract with local fail-closed simulation
+- [`examples/support-escalation`](examples/support-escalation) —
+  bounded `support.escalation` Control contract with local fail-closed simulation
+- [`examples/account-contact-change`](examples/account-contact-change) —
+  bounded `account.contact_information.change` Control contract with local fail-closed simulation
 
 ## Community
 
