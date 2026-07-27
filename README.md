@@ -53,6 +53,14 @@ See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
 [agent-builder skill](docs/agent-builder-skill.md). Maintainers should use the
 [public package release process](docs/releasing.md).
 
+## Examples
+
+- [`examples/customer-support-agent`](examples/customer-support-agent)
+- [`examples/booking-agent`](examples/booking-agent)
+- [`examples/account-management-agent`](examples/account-management-agent)
+- [`examples/financial-services-refund`](examples/financial-services-refund) —
+  bounded `support.refund` Control contract with local fail-closed simulation
+
 ## Community
 
 Start with the [public roadmap](ROADMAP.md) and choose an issue whose acceptance criteria are

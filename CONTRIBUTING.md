@@ -61,6 +61,7 @@ repository; this map does not add or rename any package script.
 | Example: account-management-agent | `npm run test --workspace @turnkeeper/example-account-management-agent` |
 | Example: booking-agent | `npm run test --workspace @turnkeeper/example-booking-agent` |
 | Example: customer-support-agent | `npm run test --workspace @turnkeeper/example-customer-support-agent` |
+| Example: financial-services-refund | `npm run test --workspace @turnkeeper/example-financial-services-refund` |
 | Example: durable-outbox-worker | Docs-only example (`examples/durable-outbox-worker/README.md`); no package script — rely on `npm run check` |
 | Agent-builder skill (`skills/turnkeeper-agent-builder`) | `node scripts/validate-skill.mjs` |
 | Package contents (any published package) | `npm run smoke:packages` (or `npm run package:check --workspaces --if-present`) |

@@ -30,8 +30,13 @@ correlation for requests that reach the server.
 7. Persist and pause on `review`.
 8. From a durable worker, call `ControlClient.getReview` until the review is terminal.
 9. Revalidate the exact immutable proposal and terminal outcome before resuming.
-10. Execute only the exact immutable proposal on `allow`, `audit`, or an approved review.
+10. Execute only the exact immutable proposal on `allow`, `audit`, or an approved review after
+    application-owned revalidation and authorization. Turnkeeper does not execute or resume the
+    action.
 11. Record the downstream outcome and enqueue metadata-only Replay evidence.
+
+For a complete `support.refund` local simulation and hosted integration sketch, see
+[`examples/financial-services-refund`](../examples/financial-services-refund).
 
 ## Review completion
 
