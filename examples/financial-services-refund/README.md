@@ -47,6 +47,7 @@ type SupportRefundSignals = {
 ```sh
 TURNKEEPER_BINDING_SECRET=synthetic-demo-only-binding-secret-000001 npm run demo
 npm test
+npm run typecheck
 ```
 
 The command uses a public synthetic binding value for local demos only. Real
@@ -73,159 +74,25 @@ to that fallback.
 
 ## Hosted integration pattern (server-side)
 
-Compile-valid sketch. Default `npm run demo` does **not** run this path.
+Compile-valid helpers live in `src/hostedIntegration.ts` and
+`src/actionContextStore.ts`. They:
+
+- validate proposal/signal shapes (positive integer cents, opaque refs, exact
+  trusted-signal keys; thresholds stay out of trusted signals)
+- build and persist/reload the original `ActionContext`
+- call `ControlClient.check` / `getReview` only when wired with credentials
+- bind terminal reviews to `review.actionRef` plus rebound action bindings
+
+Default `npm run demo` and `npm test` do **not** perform hosted network calls.
+Hosted helpers are exercised with injectable fakes in `test/phase0.test.ts`.
 
 ```ts
 import {
-  ACTION_CONTEXT_SCHEMA_VERSION,
-  ControlClient,
-  createActionBinding,
-  deriveIdempotencyKey,
-} from "@turnkeeper/sdk";
-import { supportRefundBundle } from "./index.ts";
-
-declare function authenticateActor(req: unknown): {
-  actorId: string;
-  roles: string[];
-  subjectId: string;
-};
-declare function loadTenantProject(): { tenantId: string; projectId: string; environment: "live" | "test" };
-declare function persistExactProposal(proposal: unknown): Promise<{ proposalId: string; proposalVersion: number }>;
-declare function deriveTrustedRefundSignals(proposalId: string): Promise<{
-  customer_verified: boolean;
-  within_refund_window: boolean;
-  amount_cents: number;
-  prior_refunds_30d: number;
-  refund_preflight_complete: boolean;
-}>;
-declare function persistHeldReview(input: unknown): Promise<void>;
-declare function loadImmutableProposal(proposalId: string): Promise<{
-  amountCents: number;
-  customerRef: string;
-  transactionRef: string;
-  proposalVersion: number;
-}>;
-declare function applicationAuthorizesRefund(input: unknown): Promise<boolean>;
-declare function callPaymentProvider(input: unknown): Promise<{ providerRef: string }>;
-declare function recordDownstreamOutcome(input: unknown): Promise<void>;
-declare function enqueueMetadataOnlyReplay(input: unknown): Promise<void>;
-
-const bindingSecret = process.env.TURNKEEPER_BINDING_SECRET!;
-const control = new ControlClient({
-  apiKey: process.env.TURNKEEPER_API_KEY!,
-  baseUrl: process.env.TURNKEEPER_BASE_URL,
-});
-
-export async function checkSupportRefund(req: unknown, untrustedProposal: {
-  amountCents: number;
-  customerRef: string;
-  transactionRef: string;
-}) {
-  // 1. Authenticate the actor.
-  const actor = authenticateActor(req);
-  // 2. Load tenant/project from trusted server state.
-  const scope = loadTenantProject();
-  // 3. Validate and persist the exact proposal in application-owned storage.
-  const stored = await persistExactProposal(untrustedProposal);
-  // 4. Derive trusted refund signals from backend systems (not the model).
-  const signals = await deriveTrustedRefundSignals(stored.proposalId);
-  // 5. Build the immutable ActionContext and binding.
-  const action = {
-    actionName: "support.refund" as const,
-    actorId: actor.actorId,
-    actorRoles: actor.roles,
-    conversationId: "conversation_from_trusted_state",
-    environment: scope.environment,
-    parameters: {
-      amount_cents: untrustedProposal.amountCents,
-      customer_ref: untrustedProposal.customerRef,
-      transaction_ref: untrustedProposal.transactionRef,
-    },
-    projectId: scope.projectId,
-    proposalVersion: stored.proposalVersion,
-    schemaVersion: ACTION_CONTEXT_SCHEMA_VERSION,
-    signals,
-    tenantId: scope.tenantId,
-    turnId: "turn_from_trusted_state",
-    userId: actor.subjectId,
-  };
-  const actionBinding = createActionBinding(action, bindingSecret);
-  const idempotencyKey = deriveIdempotencyKey(actionBinding);
-  // 6. Call ControlClient.check before any refund side effect.
-  const decision = await control.check(supportRefundBundle, action, {
-    bindingSecret,
-    idempotencyKey,
-  });
-  // 7. Stop permanently on block or error.
-  if (decision.decision === "block") {
-    return { applicationState: "permanently_stopped" as const, decision };
-  }
-  // 8. Persist and pause on review.
-  if (decision.decision === "review") {
-    await persistHeldReview({
-      actionBinding,
-      proposalId: stored.proposalId,
-      reviewId: decision.reviewId,
-    });
-    return { applicationState: "held_for_review" as const, decision };
-  }
-  // audit/allow still require application authorization before execution.
-  return { applicationState: "requires_application_authorization" as const, decision };
-}
-
-export async function resumeApprovedRefund(input: {
-  proposalId: string;
-  reviewId: string;
-  expectedBinding: string;
-}) {
-  // 9. Retrieve terminal review state from a durable worker.
-  const review = await control.getReview(input.reviewId);
-  if (review.status !== "approved") {
-    return { applicationState: "permanently_stopped" as const };
-  }
-  // 10. Reload and revalidate the exact immutable proposal and action binding.
-  const proposal = await loadImmutableProposal(input.proposalId);
-  const rebound = createActionBinding(
-    {
-      actionName: "support.refund",
-      actorId: "actor_from_trusted_state",
-      actorRoles: ["support_agent"],
-      conversationId: "conversation_from_trusted_state",
-      environment: "live",
-      parameters: {
-        amount_cents: proposal.amountCents,
-        customer_ref: proposal.customerRef,
-        transaction_ref: proposal.transactionRef,
-      },
-      projectId: "project_from_trusted_state",
-      proposalVersion: proposal.proposalVersion,
-      schemaVersion: ACTION_CONTEXT_SCHEMA_VERSION,
-      signals: await deriveTrustedRefundSignals(input.proposalId),
-      tenantId: "tenant_from_trusted_state",
-      turnId: "turn_from_trusted_state",
-      userId: "subject_from_trusted_state",
-    },
-    bindingSecret,
-  );
-  if (rebound !== input.expectedBinding) {
-    throw new Error("proposal_binding_mismatch");
-  }
-  // 11. Application performs its own authorization checks.
-  if (!(await applicationAuthorizesRefund(proposal))) {
-    return { applicationState: "permanently_stopped" as const };
-  }
-  // 12. Payment provider call stays in application-owned code.
-  const provider = await callPaymentProvider(proposal);
-  // 13. Record the downstream outcome locally.
-  await recordDownstreamOutcome({ proposalId: input.proposalId, provider });
-  // 14. Enqueue metadata-only Replay evidence asynchronously.
-  await enqueueMetadataOnlyReplay({
-    actionName: "support.refund",
-    outcome: "executed",
-    proposalId: input.proposalId,
-  });
-  return { applicationState: "executed_by_application" as const };
-}
+  assertTerminalReviewBound,
+  buildSupportRefundActionContext,
+  checkSupportRefund,
+  resumeApprovedRefund,
+} from "./src/hostedIntegration.ts";
 ```
 
 Never send prompts, messages, payment details, PII, or exact refund content to

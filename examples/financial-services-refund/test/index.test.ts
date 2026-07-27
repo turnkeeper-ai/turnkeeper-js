@@ -173,17 +173,19 @@ test("bundle includes fail-closed always policy and correlated support.refund ru
   );
 });
 
-test("example sources avoid PII, payment providers, and hosted API calls", async () => {
-  const [source, readme] = await Promise.all([
+test("example sources avoid PII, payment providers, and accidental hosted calls in the demo entrypoint", async () => {
+  const [source, hosted, readme] = await Promise.all([
     readFile(new URL("../src/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/hostedIntegration.ts", import.meta.url), "utf8"),
     readFile(new URL("../README.md", import.meta.url), "utf8"),
   ]);
-  for (const blob of [source, readme, JSON.stringify(SCENARIOS)]) {
+  for (const blob of [source, hosted, readme, JSON.stringify(SCENARIOS)]) {
     assert.doesNotMatch(blob, PII_PATTERN);
     assert.doesNotMatch(blob, SECRET_PATTERN);
     assert.doesNotMatch(blob, /stripe|adyen|braintree|paypal/iu);
   }
   assert.doesNotMatch(source, /new ControlClient|fetch\(/iu);
+  assert.match(hosted, /ControlClient/u);
   assert.match(readme, /does \*\*not\*\* calculate refund eligibility/iu);
   assert.match(readme, /does \*\*not\*\* execute or resume refunds/iu);
   assert.match(readme, /turnkeeper\.ai\/demo\/financial-services/u);
