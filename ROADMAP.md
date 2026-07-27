@@ -10,7 +10,8 @@ Actionable work is tracked in GitHub issues and milestones.
 - CLI scaffolding, policy validation, test generation, and integration inspection
 - Development-time MCP tools
 - Turnkeeper agent-builder skill
-- Synthetic governed-agent examples and durable outbox guidance
+- Synthetic governed-agent examples and durable outbox guidance, including the
+  [`support.refund`](examples/financial-services-refund) Control contract example
 - Alpha package release and verification automation
 
 ## Now: v0.1 stabilization

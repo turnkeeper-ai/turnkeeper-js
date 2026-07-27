@@ -9,6 +9,7 @@ const exampleDirectories = [
   "examples/customer-support-agent",
   "examples/booking-agent",
   "examples/account-management-agent",
+  "examples/financial-services-refund",
 ];
 const installationGuides = [
   ["README.md", "@turnkeeper/sdk"],
@@ -19,6 +20,7 @@ const installationGuides = [
   ["examples/customer-support-agent/README.md", "@turnkeeper/cli"],
   ["examples/booking-agent/README.md", "@turnkeeper/cli"],
   ["examples/account-management-agent/README.md", "@turnkeeper/cli"],
+  ["examples/financial-services-refund/README.md", "@turnkeeper/cli"],
   ["docs/versioning.md", "@turnkeeper/sdk"],
 ];
 const versionReferences = [
@@ -53,6 +55,7 @@ const requiredPaths = [
   "examples/customer-support-agent/package.json",
   "examples/booking-agent/package.json",
   "examples/account-management-agent/package.json",
+  "examples/financial-services-refund/package.json",
   ".github/ISSUE_TEMPLATE/bug.yml",
 ];
 const prohibitedText = [
