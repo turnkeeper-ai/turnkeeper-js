@@ -10,6 +10,11 @@ Start with the [public roadmap](ROADMAP.md) and an open issue with complete acce
 Issues labeled `good first issue` are bounded for new contributors. Issues labeled `help wanted`
 are ready for external implementation but may require more repository context.
 
+For a documentation-only first pull request, follow the
+[first contribution walkthrough](docs/first-contribution.md). It covers choosing an unassigned
+`good first issue`, commenting before starting, install, `npm run check`, a DCO-signed commit, and
+what evidence to include in the pull request.
+
 Read the [contributor architecture map](docs/contributor-architecture.md) before changing more than
 one package or public contract. It identifies dependency direction, contract ownership, tests, and
 the files that must stay synchronized.

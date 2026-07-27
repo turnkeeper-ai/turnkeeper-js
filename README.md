@@ -70,9 +70,13 @@ See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
 ## Community
 
 Start with the [public roadmap](ROADMAP.md) and choose an issue whose acceptance criteria are
-complete. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request, and use the issue
-forms for bugs, documentation improvements, and feature proposals.
+complete. New contributors should begin with an unassigned
+[`good first issue`](https://github.com/turnkeeper-ai/turnkeeper-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+and the [first contribution walkthrough](docs/first-contribution.md). Read
+[CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request, and use the issue forms for bugs,
+documentation improvements, and feature proposals.
 
+- [First contribution walkthrough](docs/first-contribution.md)
 - [Contribution workflow](CONTRIBUTING.md)
 - [Contributor architecture map](docs/contributor-architecture.md)
 - [Public roadmap](ROADMAP.md)
