@@ -122,3 +122,52 @@ export type {
   SimulationResult,
   TurnkeeperEnvironment,
 } from "./governance/policy.js";
+export {
+  CALENDAR_APPOINTMENT_CANCEL,
+  CALENDAR_APPOINTMENT_CREATE,
+  CALENDAR_APPOINTMENT_RESCHEDULE,
+  createAppointmentAction,
+  createAppointmentCancelAction,
+  createAppointmentRescheduleAction,
+} from "./governance/action-contracts/appointment.js";
+export type {
+  AppointmentActionInput,
+  AppointmentCancelSignals,
+  AppointmentCreateSignals,
+  AppointmentOperation,
+  AppointmentProposal,
+  AppointmentRescheduleSignals,
+} from "./governance/action-contracts/appointment.js";
+export type { GovernedProposalBase } from "./governance/action-contracts/shared.js";
+export {
+  BOOKING_RESERVATION_CANCEL,
+  BOOKING_RESERVATION_CREATE,
+  BOOKING_RESERVATION_MODIFY,
+  createReservationAction,
+  createReservationCancelAction,
+  createReservationModifyAction,
+} from "./governance/action-contracts/reservation.js";
+export type {
+  ReservationActionInput,
+  ReservationCancelSignals,
+  ReservationCreateSignals,
+  ReservationModifySignals,
+  ReservationOperation,
+  ReservationProposal,
+} from "./governance/action-contracts/reservation.js";
+export {
+  CRM_LEAD_STAGE_CHANGE,
+  CRM_RECORD_ASSIGNMENT_CHANGE,
+  CRM_RECORD_FIELDS_UPDATE,
+  createCrmAssignmentChangeAction,
+  createCrmFieldsUpdateAction,
+  createCrmLeadStageChangeAction,
+} from "./governance/action-contracts/crm.js";
+export type {
+  CrmActionInput,
+  CrmOperation,
+  CrmRecordType,
+  CrmWriteClass,
+  CrmWriteProposal,
+  CrmWriteSignals,
+} from "./governance/action-contracts/crm.js";
