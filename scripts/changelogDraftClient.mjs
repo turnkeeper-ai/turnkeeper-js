@@ -25,7 +25,7 @@ export function releaseChangelogDraft(tag) {
     sourceId: tag,
     sourceRef: tag,
     sourceUrl: `https://github.com/turnkeeper-ai/turnkeeper-js/releases/tag/${tag}`,
-    summary: `SDK, CLI, and MCP ${version} are available on the npm next channel with provenance.`,
+    summary: `SDK, CLI, MCP, and adapter-sentinel ${version} are available on the npm next channel with provenance.`,
     title: `Turnkeeper developer packages ${version}`,
   };
 }

@@ -175,7 +175,12 @@ export function mapRobloxSentinelCandidate(raw: unknown): ValidationResult<Detec
     aggregation_parameters.minimum_window_size = raw.minimum_window_size;
   }
   if (typeof raw.top_k === "number") aggregation_parameters.top_k = raw.top_k;
-  if (typeof raw.percentile === "number") aggregation_parameters.percentile = raw.percentile;
+  if (raw.percentile !== undefined) {
+    if (typeof raw.percentile !== "number" || !Number.isFinite(raw.percentile)) {
+      return fail("invalid_percentile");
+    }
+    aggregation_parameters.percentile = raw.percentile;
+  }
 
   const candidateInput: Record<string, unknown> = {
     schema_version: DETECTOR_CANDIDATE_SCHEMA_VERSION,

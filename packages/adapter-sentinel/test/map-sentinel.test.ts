@@ -78,6 +78,12 @@ test("unsupported categories, unknown fields, and raw content fail closed", () =
   assert.equal(mapRobloxSentinelCandidate({ ...BASE, aggregation_stats: {} }).ok, false);
 });
 
+test("non-finite percentile fails closed instead of passing NaN through", () => {
+  const mapped = mapRobloxSentinelCandidate({ ...BASE, percentile: Number.NaN });
+  assert.equal(mapped.ok, false);
+  if (!mapped.ok) assert.equal(mapped.code, "invalid_percentile");
+});
+
 test("missing calibration/config/threshold provenance fails closed", () => {
   const { calibration_ref: _c, ...withoutCal } = BASE;
   const missing = mapRobloxSentinelCandidate(withoutCal);

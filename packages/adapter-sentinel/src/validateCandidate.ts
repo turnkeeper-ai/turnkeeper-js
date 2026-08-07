@@ -236,6 +236,7 @@ export function validateDetectorCandidate(raw: unknown): ValidationResult<Detect
     if (params.percentile !== undefined) {
       if (
         typeof params.percentile !== "number" ||
+        !Number.isFinite(params.percentile) ||
         params.percentile < 0 ||
         params.percentile > 100
       ) {
