@@ -43,6 +43,7 @@ try {
     "@turnkeeper/sdk",
     "@turnkeeper/cli",
     "@turnkeeper/mcp",
+    "@turnkeeper/adapter-sentinel",
   ]) {
     const report = JSON.parse(
       npm([
@@ -96,6 +97,16 @@ try {
   );
   if (sdk.stderr) throw new Error("SDK import smoke emitted stderr.");
 
+  const adapter = node(
+    [
+      "--input-type=module",
+      "-e",
+      'import("@turnkeeper/adapter-sentinel").then((module) => { if (typeof module.mapRobloxSentinelCandidate !== "function" || module.ROBLOX_SENTINEL_DETECTOR_ID !== "roblox_sentinel") process.exit(1); });',
+    ],
+    consumer,
+  );
+  if (adapter.stderr) throw new Error("adapter-sentinel import smoke emitted stderr.");
+
   const cli = node(
     [
       path.join(
@@ -132,7 +143,7 @@ try {
   }
 
   console.log(
-    "Standalone SDK plus combined prerelease SDK, CLI, and MCP package smoke verified. Release CI verifies CLI and MCP independently after their registry dependencies are available.",
+    "Standalone SDK plus combined prerelease SDK, CLI, MCP, and adapter-sentinel package smoke verified. Release CI verifies CLI and MCP independently after their registry dependencies are available.",
   );
 } finally {
   await rm(root, { force: true, recursive: true });

@@ -139,7 +139,12 @@ try {
   await mkdir(consumer, { recursive: true });
 
   const tarballs = [];
-  for (const workspace of ["@turnkeeper/sdk", "@turnkeeper/cli", "@turnkeeper/mcp"]) {
+  for (const workspace of [
+    "@turnkeeper/sdk",
+    "@turnkeeper/cli",
+    "@turnkeeper/mcp",
+    "@turnkeeper/adapter-sentinel",
+  ]) {
     const report = JSON.parse(
       npm(
         ["pack", "--workspace", workspace, "--ignore-scripts", "--json", "--pack-destination", packs],

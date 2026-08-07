@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add `@turnkeeper/adapter-sentinel`, a claim-safe zero-dependency mapper from
+  Sentinel-like window candidates to Turnkeeper `DetectorCandidate` metadata (not a Roblox
+  partnership or endorsement).
+
 ## 0.1.0-alpha.7 - 2026-07-27
 
 - Add dated Replay contract `2026-07-27` with `self_hosted` provider metadata while preserving the

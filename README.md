@@ -3,12 +3,13 @@
 Public developer tooling for building governed AI-agent workflows with Turnkeeper.
 
 ```text
-packages/sdk      Replay and bounded Control clients
-packages/cli      Scaffolding, policy validation, tests, and integration inspection
-packages/mcp      Development-time MCP tools
-skills/           Turnkeeper agent-builder skill
-examples/         Synthetic, runnable agent integrations
-docs/             Public integration and package documentation
+packages/sdk                 Replay and bounded Control clients
+packages/cli                 Scaffolding, policy validation, tests, and integration inspection
+packages/mcp                 Development-time MCP tools
+packages/adapter-sentinel    Claim-safe Sentinel-like → DetectorCandidate mapper
+skills/                      Turnkeeper agent-builder skill
+examples/                    Synthetic, runnable agent integrations
+docs/                        Public integration and package documentation
 ```
 
 The repository contains client libraries and developer tooling only. Hosted dashboards,
@@ -37,17 +38,19 @@ tracking.
 npm install @turnkeeper/sdk@0.1.0-alpha.7
 npm install --save-dev @turnkeeper/cli@0.1.0-alpha.7
 TURNKEEPER_WORKSPACE_ROOT="$PWD" npx -y @turnkeeper/mcp@0.1.0-alpha.7
+npm install @turnkeeper/adapter-sentinel@0.1.0-alpha.7
 ```
 
-Equivalent moving-channel package specs are `@turnkeeper/sdk@next`, `@turnkeeper/cli@next`, and
-`@turnkeeper/mcp@next`. Do not use an unversioned install until the project explicitly promotes a
-release to `latest`.
+Equivalent moving-channel package specs are `@turnkeeper/sdk@next`, `@turnkeeper/cli@next`,
+`@turnkeeper/mcp@next`, and `@turnkeeper/adapter-sentinel@next`. Do not use an unversioned install
+until the project explicitly promotes a release to `latest`.
 
 ## Packages
 
 - [`@turnkeeper/sdk`](packages/sdk/README.md)
 - [`@turnkeeper/cli`](packages/cli/README.md)
 - [`@turnkeeper/mcp`](packages/mcp/README.md)
+- [`@turnkeeper/adapter-sentinel`](packages/adapter-sentinel/README.md)
 
 See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
 [agent-builder skill](docs/agent-builder-skill.md). Maintainers should use the
