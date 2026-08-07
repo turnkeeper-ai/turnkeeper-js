@@ -1,13 +1,14 @@
 # Releasing the public packages
 
-Turnkeeper publishes `@turnkeeper/sdk`, `@turnkeeper/cli`, and `@turnkeeper/mcp` as one fixed
-prerelease group while their contracts are in alpha. Releases run only from annotated tags whose
-commits are already reachable from `origin/main`.
+Turnkeeper publishes `@turnkeeper/sdk`, `@turnkeeper/cli`, `@turnkeeper/mcp`, and
+`@turnkeeper/adapter-sentinel` as one fixed prerelease group while their contracts are in alpha.
+Releases run only from annotated tags whose commits are already reachable from `origin/main`.
 
 ## Release contract
 
-1. Update the root and all three package versions together.
+1. Update the root and all four package versions together.
 2. Pin the CLI dependency on the SDK, and both MCP dependencies, to that exact version.
+   `@turnkeeper/adapter-sentinel` stays zero-dependency.
 3. Update the changelog, examples, docs, MCP metadata, scaffolds, and agent-builder skill.
 4. Run `npm run check` with Node 22 and Node 24.
 5. Merge the release commit through protected `main`.
@@ -21,12 +22,14 @@ The tag starts `.github/workflows/release.yml`. The workflow:
   check with Node 24.18.0 and npm 11.6.2;
 - creates the package tarballs once, then collects the versioned public JSON Schemas and generates
   CycloneDX SBOMs and SHA-256 checksums;
-- publishes those exact tarballs in SDK, CLI, then MCP order through npm trusted publishing;
+- publishes those exact tarballs in SDK, CLI, MCP, then adapter-sentinel order through npm trusted
+  publishing;
 - safely resumes after a partial publish only when the registry artifact has the same SHA-512
   integrity as the local tarball;
 - allows up to 15 minutes for each registry write to become readable;
-- installs all three exact versions into a clean temporary project and verifies SDK import, CLI
-  execution, MCP stdio startup, npm signatures, SLSA provenance, and the `next` dist-tag;
+- installs all four exact versions into a clean temporary project and verifies SDK import,
+  adapter-sentinel import, CLI execution, MCP stdio startup, npm signatures, SLSA provenance, and
+  the `next` dist-tag;
 - attaches the identical tarballs, versioned schemas, SBOMs, and checksums to a GitHub prerelease.
 - creates or refreshes one unpublished changelog draft through the hosted platform only after all
   package, provenance, consumer, and GitHub prerelease checks succeed.
@@ -48,11 +51,56 @@ For each npm package, configure a GitHub Actions trusted publisher with these ex
 | Workflow filename | `release.yml` |
 | Environment | `npm-release` |
 
-Configure trusted publishing for all three packages:
+Configure trusted publishing for all four packages:
 
 - `@turnkeeper/sdk`
 - `@turnkeeper/cli`
 - `@turnkeeper/mcp`
+- `@turnkeeper/adapter-sentinel`
+
+### Adding a new package to the release group (bootstrap)
+
+npm trusted publishing can only be configured **after** the package name exists on the
+registry. OIDC cannot publish the very first version of a never-before-published name
+([npm/cli#8544](https://github.com/npm/cli/issues/8544)).
+
+One-time bootstrap for a new public package (example: `@turnkeeper/adapter-sentinel`):
+
+1. Authenticate as an `@turnkeeper` maintainer: `npm login` (interactive; do not paste tokens
+   into chat or commit them).
+2. Reserve the name with a disposable stub (preferred) **or** a one-off token publish of the
+   real first version:
+
+```sh
+# From packages/adapter-sentinel after build — stub reserve (then configure trust):
+npm publish --access public --tag bootstrap --dry-run   # review first
+# Real first publish uses a temporary granular publish token or interactive login.
+# Prefer publishing 0.0.0 as a stub, then bump to the synchronized alpha on the next release.
+```
+
+3. Configure the trusted publisher to match the release workflow exactly:
+
+```sh
+npm trust github @turnkeeper/adapter-sentinel \
+  --file release.yml \
+  --repository turnkeeper-ai/turnkeeper-js \
+  --environment npm-release \
+  --allow-publish \
+  --yes
+```
+
+Equivalent UI path: `https://www.npmjs.com/package/@turnkeeper/adapter-sentinel/access` →
+Trusted Publisher → GitHub Actions → org `turnkeeper-ai`, repo `turnkeeper-js`, workflow
+`release.yml`, environment `npm-release`, allow `npm publish`.
+
+4. Verify:
+
+```sh
+npm trust list @turnkeeper/adapter-sentinel
+```
+
+5. Confirm the npm org has a **trusted publisher** entry for the package before cutting the next
+   annotated `v*` tag. Do not add `NPM_TOKEN` / `NODE_AUTH_TOKEN` to the release workflow.
 
 The release job intentionally has `id-token: write` and does not use an npm token. Do not add
 `NPM_TOKEN` or `NODE_AUTH_TOKEN` secrets to this workflow.
@@ -101,6 +149,8 @@ npm view "@turnkeeper/sdk@${version}" version dist.integrity \
 npm view "@turnkeeper/cli@${version}" version dist.integrity \
   dist.attestations.provenance.predicateType
 npm view "@turnkeeper/mcp@${version}" version dist.integrity \
+  dist.attestations.provenance.predicateType
+npm view "@turnkeeper/adapter-sentinel@${version}" version dist.integrity \
   dist.attestations.provenance.predicateType
 
 consumer="$(mktemp -d)"

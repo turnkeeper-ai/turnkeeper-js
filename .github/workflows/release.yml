@@ -74,6 +74,7 @@ jobs:
           const sdk = readManifest("packages/sdk/package.json");
           const cli = readManifest("packages/cli/package.json");
           const mcp = readManifest("packages/mcp/package.json");
+          const adapterSentinel = readManifest("packages/adapter-sentinel/package.json");
           const version = root.version;
 
           assert.match(version, /^\d+\.\d+\.\d+-[0-9A-Za-z.-]+$/u, "release must be a prerelease");
@@ -82,9 +83,15 @@ jobs:
           assert.equal(sdk.version, version, "SDK version is not aligned");
           assert.equal(cli.version, version, "CLI version is not aligned");
           assert.equal(mcp.version, version, "MCP version is not aligned");
+          assert.equal(adapterSentinel.version, version, "adapter-sentinel version is not aligned");
           assert.equal(cli.dependencies?.["@turnkeeper/sdk"], version, "CLI must pin this SDK version");
           assert.equal(mcp.dependencies?.["@turnkeeper/sdk"], version, "MCP must pin this SDK version");
           assert.equal(mcp.dependencies?.["@turnkeeper/cli"], version, "MCP must pin this CLI version");
+          assert.deepEqual(
+            adapterSentinel.dependencies ?? {},
+            {},
+            "adapter-sentinel must remain zero-dependency",
+          );
           NODE
 
       - name: Install and verify the release commit
@@ -103,10 +110,12 @@ jobs:
           npm pack --workspace @turnkeeper/sdk --ignore-scripts --pack-destination release-artifacts
           npm pack --workspace @turnkeeper/cli --ignore-scripts --pack-destination release-artifacts
           npm pack --workspace @turnkeeper/mcp --ignore-scripts --pack-destination release-artifacts
+          npm pack --workspace @turnkeeper/adapter-sentinel --ignore-scripts --pack-destination release-artifacts
 
           npm sbom --workspace @turnkeeper/sdk --sbom-format cyclonedx > release-artifacts/turnkeeper-sdk.cdx.json
           npm sbom --workspace @turnkeeper/cli --sbom-format cyclonedx > release-artifacts/turnkeeper-cli.cdx.json
           npm sbom --workspace @turnkeeper/mcp --sbom-format cyclonedx > release-artifacts/turnkeeper-mcp.cdx.json
+          npm sbom --workspace @turnkeeper/adapter-sentinel --sbom-format cyclonedx > release-artifacts/turnkeeper-adapter-sentinel.cdx.json
           cp spec/replay-2026-07-09.schema.json release-artifacts/
           cp spec/replay-2026-07-27.schema.json release-artifacts/
           cp spec/control-check-request-2026-07-16.schema.json release-artifacts/
@@ -117,6 +126,7 @@ jobs:
             "release-artifacts/turnkeeper-sdk-${version}.tgz" \
             "release-artifacts/turnkeeper-cli-${version}.tgz" \
             "release-artifacts/turnkeeper-mcp-${version}.tgz" \
+            "release-artifacts/turnkeeper-adapter-sentinel-${version}.tgz" \
             "release-artifacts/replay-2026-07-09.schema.json" \
             "release-artifacts/replay-2026-07-27.schema.json" \
             "release-artifacts/control-check-request-2026-07-16.schema.json" \
@@ -224,6 +234,7 @@ jobs:
           publish_or_verify "@turnkeeper/sdk" "./release-artifacts/turnkeeper-sdk-${version}.tgz"
           publish_or_verify "@turnkeeper/cli" "./release-artifacts/turnkeeper-cli-${version}.tgz"
           publish_or_verify "@turnkeeper/mcp" "./release-artifacts/turnkeeper-mcp-${version}.tgz"
+          publish_or_verify "@turnkeeper/adapter-sentinel" "./release-artifacts/turnkeeper-adapter-sentinel-${version}.tgz"
 
       - name: Verify clean registry consumers and provenance
         shell: bash
@@ -242,11 +253,13 @@ jobs:
             --prefix "${consumer}" \
             "@turnkeeper/sdk@${version}" \
             "@turnkeeper/cli@${version}" \
-            "@turnkeeper/mcp@${version}"
+            "@turnkeeper/mcp@${version}" \
+            "@turnkeeper/adapter-sentinel@${version}"
 
           (
             cd "${consumer}"
             node --input-type=module -e 'const sdk = await import("@turnkeeper/sdk"); if (Object.keys(sdk).length === 0) throw new Error("SDK exports are empty");'
+            node --input-type=module -e 'const adapter = await import("@turnkeeper/adapter-sentinel"); if (typeof adapter.mapRobloxSentinelCandidate !== "function") throw new Error("adapter-sentinel exports are incomplete");'
             ./node_modules/.bin/turnkeeper --help
 
             set +e
@@ -272,7 +285,7 @@ jobs:
 
           NODE
 
-          for package_name in @turnkeeper/sdk @turnkeeper/cli @turnkeeper/mcp; do
+          for package_name in @turnkeeper/sdk @turnkeeper/cli @turnkeeper/mcp @turnkeeper/adapter-sentinel; do
             test "$(npm view "${package_name}" dist-tags.next --registry="${registry}")" = "${version}"
             test "$(npm view "${package_name}@${version}" dist.attestations.provenance.predicateType --registry="${registry}")" = "https://slsa.dev/provenance/v1"
           done

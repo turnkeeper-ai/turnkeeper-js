@@ -4,7 +4,12 @@ import process from "node:process";
 
 const root = process.cwd();
 const version = "0.1.0-alpha.7";
-const packageDirectories = ["packages/sdk", "packages/cli", "packages/mcp"];
+const packageDirectories = [
+  "packages/sdk",
+  "packages/cli",
+  "packages/mcp",
+  "packages/adapter-sentinel",
+];
 const exampleDirectories = [
   "examples/customer-support-agent",
   "examples/booking-agent",
@@ -19,6 +24,7 @@ const installationGuides = [
   ["packages/sdk/README.md", "@turnkeeper/sdk"],
   ["packages/cli/README.md", "@turnkeeper/cli"],
   ["packages/mcp/README.md", "@turnkeeper/mcp"],
+  ["packages/adapter-sentinel/README.md", "@turnkeeper/adapter-sentinel"],
   ["docs/mcp.md", "@turnkeeper/mcp"],
   ["examples/customer-support-agent/README.md", "@turnkeeper/cli"],
   ["examples/booking-agent/README.md", "@turnkeeper/cli"],

@@ -9,7 +9,7 @@ import {
 test("release changelog copy is deterministic, bounded, and exact-versioned", () => {
   assert.deepEqual(releaseChangelogDraft("v0.1.0-alpha.6"), {
     content: [
-      "Published @turnkeeper/sdk, @turnkeeper/cli, and @turnkeeper/mcp at 0.1.0-alpha.6 on the npm next channel.",
+      "Published @turnkeeper/sdk, @turnkeeper/cli, @turnkeeper/mcp, and @turnkeeper/adapter-sentinel at 0.1.0-alpha.6 on the npm next channel.",
       "The release includes npm provenance, verified package signatures, checksums, SBOMs, and clean consumer-install checks.",
       "Install the exact SDK prerelease with npm install @turnkeeper/sdk@0.1.0-alpha.6.",
     ].join("\n\n"),
