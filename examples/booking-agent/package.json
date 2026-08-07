@@ -14,7 +14,7 @@
     "@turnkeeper/sdk": "0.1.0-alpha.7"
   },
   "devDependencies": {
-    "@types/node": "22.19.9",
+    "@types/node": "26.1.2",
     "tsx": "4.23.1",
     "typescript": "5.7.3"
   }
