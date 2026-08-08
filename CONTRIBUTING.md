@@ -74,7 +74,15 @@ repository; this map does not add or rename any package script.
 
 Focused commands speed up iteration but do not replace the gate. `npm run check` remains the
 required final command before review — it runs build, workspace typecheck, workspace tests,
-package-content checks, `npm run smoke:packages`, and `node scripts/validate-skill.mjs`.
+coverage thresholds, package-content checks, `npm run smoke:packages`, and
+`node scripts/validate-skill.mjs`.
+
+Run `npm run coverage` when a change adds or restructures source branches. The command reports
+statement, branch, function, and line coverage across package sources, runnable examples, and the
+release changelog client. The repository gate requires at least 88% statements, 65% branches, 90%
+functions, and 88% lines across the supported Node 22 and Node 24 runtimes. Add behavior-focused
+tests when coverage falls; do not exclude new source or lower a threshold merely to make the gate
+pass.
 
 Use Node.js 22.20 or Node.js 24 and npm 11 for both focused commands and the gate.
 
