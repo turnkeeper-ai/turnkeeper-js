@@ -1,0 +1,89 @@
+{
+  "scenario_id": "synthetic_cross_platform_trajectory_01",
+  "description": "Two origin members contribute bounded signals that a third company evaluates under its own policy.",
+  "contract_status": {
+    "exchange_envelopes": "implemented_synthetic",
+    "multi_company_case_room": "roadmap"
+  },
+  "signals": [
+    {
+      "schema_version": "2026-08-08",
+      "signal_id": "signal_synthetic_01",
+      "idempotency_key": "signal_idempotency_01",
+      "origin_member_id": "member_synthetic_a",
+      "identifier_type": "verified_email",
+      "match_handle": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "category": "boundary_testing",
+      "signal_strength_band": "elevated",
+      "evidence_tier": "window_available",
+      "evidence_snapshot_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "observed_window": {
+        "started_at": "2026-08-08T00:00:00.000Z",
+        "ended_at": "2026-08-08T00:03:00.000Z"
+      },
+      "purpose": "local_investigation",
+      "policy_ref": "exchange_policy_v1",
+      "policy_version": "2026-08-08",
+      "issued_at": "2026-08-08T00:05:00.000Z",
+      "expires_at": "2026-09-08T00:05:00.000Z",
+      "provenance_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "authorization_artifact_id": "authz_synthetic_01",
+      "origin_signature": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "origin_key_id": "member_key_synthetic_a"
+    },
+    {
+      "schema_version": "2026-08-08",
+      "signal_id": "signal_synthetic_02",
+      "idempotency_key": "signal_idempotency_02",
+      "origin_member_id": "member_synthetic_b",
+      "identifier_type": "verified_email",
+      "match_handle": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "category": "off_platform_migration",
+      "signal_strength_band": "high",
+      "evidence_tier": "corroborated",
+      "evidence_snapshot_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "observed_window": {
+        "started_at": "2026-08-08T01:10:00.000Z",
+        "ended_at": "2026-08-08T01:18:00.000Z"
+      },
+      "purpose": "specialist_review",
+      "policy_ref": "exchange_policy_v1",
+      "policy_version": "2026-08-08",
+      "issued_at": "2026-08-08T01:22:00.000Z",
+      "expires_at": "2026-09-08T01:22:00.000Z",
+      "provenance_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "authorization_artifact_id": "authz_synthetic_02",
+      "origin_signature": "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
+      "origin_key_id": "member_key_synthetic_b"
+    }
+  ],
+  "revocations": [
+    {
+      "schema_version": "2026-08-08",
+      "revocation_id": "revocation_synthetic_01",
+      "signal_id": "signal_synthetic_01",
+      "origin_member_id": "member_synthetic_a",
+      "reason": "source_invalidated",
+      "issued_at": "2026-08-09T10:00:00.000Z",
+      "origin_signature": "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "origin_key_id": "member_key_synthetic_a"
+    }
+  ],
+  "illustrative_local_outcomes": [
+    {
+      "member_id": "member_synthetic_a",
+      "status": "signal_revoked",
+      "shared_conclusion": false
+    },
+    {
+      "member_id": "member_synthetic_b",
+      "status": "specialist_review_open",
+      "shared_conclusion": false
+    },
+    {
+      "member_id": "member_synthetic_c",
+      "status": "local_policy_review_required",
+      "shared_conclusion": false
+    }
+  ]
+}

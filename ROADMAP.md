@@ -15,6 +15,9 @@ Actionable work is tracked in GitHub issues and milestones.
   [`support.escalation`](examples/support-escalation), and
   [`account.contact_information.change`](examples/account-contact-change)
 - Alpha package release and verification automation
+- Versioned Ward exchange envelopes, revocation, private-match contracts, and validators for
+  synthetic privacy-minimized collaboration. See the
+  [Safety Exchange Protocol v0.1 working draft](docs/safety-exchange-protocol-v0.1.md).
 
 ## Now: v0.1 stabilization
 
@@ -36,6 +39,10 @@ Actionable work is tracked in GitHub issues and milestones.
 Additional language SDKs and broader tooling are considered only after the public contracts are
 stable and sustained user evidence justifies their maintenance cost. Later items are not ready for
 implementation unless a maintainer opens or accepts a scoped issue.
+
+Live multi-company case rooms, governed membership, provider feeds, and an industry conformance
+program also remain later roadmap work. The public exchange contracts do not imply a live network,
+an adopted standard, or an official partner relationship.
 
 ## Out of scope
 

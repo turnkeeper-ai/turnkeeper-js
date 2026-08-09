@@ -63,6 +63,7 @@ export {
   type ReplayWireResultError,
 } from "./replay/response.js";
 export type { TurnkeeperFetch } from "./transport.js";
+export * from "./ward/index.js";
 export {
   CONTROL_API_VERSION,
   CONTROL_REVIEW_API_VERSION,
