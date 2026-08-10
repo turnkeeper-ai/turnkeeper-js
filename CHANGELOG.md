@@ -5,6 +5,9 @@
 - Add `@turnkeeper/adapter-sentinel`, a claim-safe zero-dependency mapper from
   Sentinel-like window candidates to Turnkeeper `DetectorCandidate` metadata (not a Roblox
   partnership or endorsement).
+- Expand Safety Exchange Protocol v0.1 with additive cryptographic, private-match, delivery,
+  governance, threat-model, and conformance profiles; publish a dated JSON Schema suite and
+  positive/negative synthetic fixtures; and validate match-lookup and delivery-record objects.
 
 ## 0.1.0-alpha.7 - 2026-07-27
 

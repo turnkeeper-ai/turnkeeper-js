@@ -57,9 +57,11 @@ See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
 [public package release process](docs/releasing.md).
 
 For the privacy-minimized Ward exchange contracts, read the
-[Safety Exchange Protocol v0.1 working draft](docs/safety-exchange-protocol-v0.1.md) and its
-[synthetic collaboration fixture](docs/examples/safety-exchange-v0.1.synthetic.json). The
-contracts are implemented with synthetic data; live multi-company collaboration remains roadmap.
+[Safety Exchange Protocol v0.1 working draft](docs/safety-exchange-protocol-v0.1.md), its linked
+operational profiles, and the
+[synthetic conformance fixtures](docs/examples/safety-exchange-v0.1.conformance.json). The public
+SDK validates structural contracts with synthetic data. Cryptographic helpers, live membership,
+durable delivery, operational conformance, and multi-company collaboration remain roadmap.
 
 ## Examples
 
