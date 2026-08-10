@@ -18,6 +18,9 @@ Actionable work is tracked in GitHub issues and milestones.
 - Versioned Ward exchange envelopes, revocation, private-match contracts, and validators for
   synthetic privacy-minimized collaboration. See the
   [Safety Exchange Protocol v0.1 working draft](docs/safety-exchange-protocol-v0.1.md).
+- Additive v0.1 working profiles for cryptography, private matching, delivery, governance, threat
+  modeling, and conformance, plus a machine-readable schema suite and negative fixtures. These are
+  implementation requirements, not evidence of a live exchange or operational certification.
 
 ## Now: v0.1 stabilization
 

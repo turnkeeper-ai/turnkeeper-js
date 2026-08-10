@@ -1,0 +1,49 @@
+{
+  "fixture_version": "2026-08-08",
+  "description": "Mutations that every schema-conformant implementation must reject.",
+  "cases": [
+    {
+      "name": "raw content smuggling",
+      "object": "exchange_signal",
+      "path": "messages",
+      "value": ["synthetic prohibited content"],
+      "expected_code": "prohibited_content_field"
+    },
+    {
+      "name": "automatic enforcement purpose",
+      "object": "exchange_signal",
+      "path": "purpose",
+      "value": "automated_enforcement",
+      "expected_code": "invalid_signal_metadata"
+    },
+    {
+      "name": "unknown nested explanation",
+      "object": "exchange_signal",
+      "path": "observed_window.explanations",
+      "value": "synthetic prohibited explanation",
+      "expected_code": "prohibited_content_field"
+    },
+    {
+      "name": "expiry does not follow issue time",
+      "object": "exchange_signal",
+      "path": "expires_at",
+      "value": "2026-08-08T00:05:00.000Z",
+      "schema_reject": false,
+      "expected_code": "invalid_expiry"
+    },
+    {
+      "name": "lookup cannot use audit retention",
+      "object": "match_lookup_request",
+      "path": "purpose",
+      "value": "audit_retention",
+      "expected_code": "invalid_purpose"
+    },
+    {
+      "name": "delivery cannot carry signal and revocation",
+      "object": "exchange_delivery_record",
+      "path": "revocation",
+      "copy_from": "exchange_revocation",
+      "expected_code": "invalid_delivery_payload"
+    }
+  ]
+}
