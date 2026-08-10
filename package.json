@@ -16,7 +16,8 @@
   "scripts": {
     "audit:dependencies": "npm audit --omit=dev --audit-level=high",
     "build": "npm run build --workspace @turnkeeper/sdk && npm run build --workspaces --if-present",
-    "check": "npm run build && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present && npm run test:release-tools && npm run package:check --workspaces --if-present && npm run smoke:packages && node scripts/validate-skill.mjs",
+    "check": "npm run check:repository-boundary && npm run build && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present && npm run test:release-tools && npm run package:check --workspaces --if-present && npm run smoke:packages && node scripts/validate-skill.mjs",
+    "check:repository-boundary": "node scripts/check-public-repository-boundary.mjs",
     "package:check": "npm run package:check --workspaces --if-present",
     "smoke:packages": "node scripts/smoke-packages.mjs",
     "smoke:macos-consumer": "node scripts/smoke-macos-consumer.mjs",
