@@ -65,9 +65,16 @@ durable delivery, operational conformance, and multi-company collaboration remai
 
 ## Examples
 
+See the [synthetic examples index](examples/README.md) for every current scenario, public surface,
+run status, and focused verification command.
+
 - [`examples/customer-support-agent`](examples/customer-support-agent)
 - [`examples/booking-agent`](examples/booking-agent)
 - [`examples/account-management-agent`](examples/account-management-agent)
+- [`examples/appointment-create`](examples/appointment-create) —
+  persisted proposal, review hold, exact-binding revalidation, and unknown-outcome reconciliation
+- [`examples/durable-outbox-worker`](examples/durable-outbox-worker) —
+  documentation-only durable Replay outbox pattern
 - [`examples/financial-services-refund`](examples/financial-services-refund) —
   bounded `support.refund` Control contract with local fail-closed simulation
 - [`examples/support-escalation`](examples/support-escalation) —
