@@ -16,7 +16,8 @@
   "scripts": {
     "audit:dependencies": "npm audit --omit=dev --audit-level=high",
     "build": "npm run build --workspace @turnkeeper/sdk && npm run build --workspaces --if-present",
-    "check": "npm run build && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present && npm run test:release-tools && npm run package:check --workspaces --if-present && npm run smoke:packages && node scripts/validate-skill.mjs",
+    "check": "npm run build && npm run typecheck --workspaces --if-present && npm run coverage && npm run package:check --workspaces --if-present && npm run smoke:packages && node scripts/validate-skill.mjs",
+    "coverage": "node scripts/runCoverage.mjs",
     "package:check": "npm run package:check --workspaces --if-present",
     "smoke:packages": "node scripts/smoke-packages.mjs",
     "smoke:macos-consumer": "node scripts/smoke-macos-consumer.mjs",
@@ -24,9 +25,26 @@
     "test:release-tools": "node --test scripts/*.test.mjs",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
+  "c8": {
+    "all": true,
+    "include": [
+      "packages/*/src/**/*.ts",
+      "examples/*/src/**/*.ts",
+      "scripts/changelogDraftClient.mjs"
+    ],
+    "reporter": [
+      "text-summary"
+    ],
+    "check-coverage": true,
+    "statements": 88,
+    "branches": 65,
+    "functions": 90,
+    "lines": 88
+  },
   "devDependencies": {
     "@types/node": "22.19.9",
     "ajv": "8.20.0",
+    "c8": "12.0.0",
     "tsx": "4.23.1",
     "typescript": "5.7.3"
   }
