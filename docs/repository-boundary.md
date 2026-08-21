@@ -27,6 +27,10 @@ Public code may contain:
 - metadata-only Replay helpers;
 - synthetic examples, fixtures, and public documentation.
 
+This repository must not contain internal business documents, including company strategy,
+fundraising or investor materials, founder operating notes, prospecting or sales pipelines,
+outreach drafts, unpublished marketing copy, or private customer and design-partner plans.
+
 ## Private hosted-platform repository
 
 The private platform owns service implementation and operations:
@@ -67,6 +71,9 @@ Before merging a public-contract change:
 5. update public docs and version compatibility;
 6. verify package contents contain no hosted internals or secrets;
 7. run package, example, security, and contract checks.
+
+The repository-wide check includes a tracked-document boundary scan. Keep internal business
+material in an access-controlled company system, not in this public Git history.
 
 If a change requires private persistence, migrations, hosted authorization, billing, or operations,
 implement that portion in the hosted-platform repository and expose only the approved public
