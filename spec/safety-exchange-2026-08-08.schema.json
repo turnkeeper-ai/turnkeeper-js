@@ -1,0 +1,360 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://turnkeeper.ai/schemas/safety-exchange/2026-08-08.json",
+  "title": "Turnkeeper Safety Exchange Protocol 2026-08-08",
+  "description": "Privacy-minimized structural contracts for synthetic v0.1 protocol conformance.",
+  "oneOf": [
+    { "$ref": "#/$defs/detectorCandidate" },
+    { "$ref": "#/$defs/publishProposal" },
+    { "$ref": "#/$defs/exchangeSignal" },
+    { "$ref": "#/$defs/exchangeRevocation" },
+    { "$ref": "#/$defs/matchLookupRequest" },
+    { "$ref": "#/$defs/exchangeDeliveryRecord" }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,128}$"
+    },
+    "ref": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9:_/-]{8,256}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{32,512}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 35
+    },
+    "contractVersion": {
+      "const": "2026-08-08"
+    },
+    "category": {
+      "enum": [
+        "secrecy_request",
+        "threat_or_coercion",
+        "boundary_testing",
+        "off_platform_migration",
+        "sexualization",
+        "intimate_content_solicitation"
+      ]
+    },
+    "strengthBand": {
+      "enum": ["minimal", "elevated", "high", "severe"]
+    },
+    "evidenceTier": {
+      "enum": ["signal_only", "window_available", "corroborated", "reviewed"]
+    },
+    "purpose": {
+      "enum": ["local_investigation", "specialist_review", "audit_retention"]
+    },
+    "activeLookupPurpose": {
+      "enum": ["local_investigation", "specialist_review"]
+    },
+    "identifierType": {
+      "enum": ["verified_email", "verified_phone"]
+    },
+    "observedWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["started_at", "ended_at"],
+      "properties": {
+        "started_at": { "$ref": "#/$defs/timestamp" },
+        "ended_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "detectorCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "candidate_id",
+        "idempotency_key",
+        "tenant_id",
+        "subject_ref",
+        "category",
+        "detector",
+        "window",
+        "signal",
+        "evidence",
+        "observed_at",
+        "received_at"
+      ],
+      "properties": {
+        "schema_version": { "const": "1" },
+        "candidate_id": { "$ref": "#/$defs/id" },
+        "idempotency_key": { "$ref": "#/$defs/id" },
+        "tenant_id": { "$ref": "#/$defs/id" },
+        "subject_ref": { "$ref": "#/$defs/id" },
+        "related_subject_refs": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "conversation_ref": { "$ref": "#/$defs/id" },
+        "category": { "$ref": "#/$defs/category" },
+        "detector": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "detector_id",
+            "detector_version",
+            "detector_config_ref",
+            "calibration_ref"
+          ],
+          "properties": {
+            "detector_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "detector_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "detector_config_ref": { "$ref": "#/$defs/id" },
+            "calibration_ref": { "$ref": "#/$defs/id" },
+            "detector_run_ref": { "$ref": "#/$defs/id" }
+          }
+        },
+        "window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["aggregation_window_ref", "started_at", "ended_at", "observation_count"],
+          "properties": {
+            "aggregation_window_ref": { "$ref": "#/$defs/id" },
+            "started_at": { "$ref": "#/$defs/timestamp" },
+            "ended_at": { "$ref": "#/$defs/timestamp" },
+            "observation_count": { "type": "integer", "minimum": 1, "maximum": 10000 }
+          }
+        },
+        "signal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "aggregation_name",
+            "signal_strength_band",
+            "threshold_profile_ref"
+          ],
+          "properties": {
+            "method": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "aggregation_name": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "signal_strength_band": { "$ref": "#/$defs/strengthBand" },
+            "threshold_profile_ref": { "$ref": "#/$defs/id" },
+            "aggregation_parameters": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "minimum_window_size": { "type": "integer", "minimum": 1, "maximum": 10000 },
+                "top_k": { "type": "integer", "minimum": 1, "maximum": 10000 },
+                "percentile": { "type": "number", "minimum": 0, "maximum": 1 }
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["evidence_ref", "evidence_tier"],
+          "properties": {
+            "evidence_ref": { "$ref": "#/$defs/ref" },
+            "evidence_snapshot_ref": { "$ref": "#/$defs/ref" },
+            "evidence_manifest_digest": { "$ref": "#/$defs/digest" },
+            "evidence_tier": { "$ref": "#/$defs/evidenceTier" }
+          }
+        },
+        "observed_at": { "$ref": "#/$defs/timestamp" },
+        "received_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "publishProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "proposal_id",
+        "idempotency_key",
+        "tenant_id",
+        "candidate_id",
+        "subject_ref",
+        "identifier_type",
+        "identifier_commitment",
+        "category",
+        "signal_strength_band",
+        "evidence_tier",
+        "observed_window",
+        "purpose",
+        "expires_at",
+        "policy_ref",
+        "policy_version",
+        "created_at"
+      ],
+      "properties": {
+        "schema_version": { "$ref": "#/$defs/contractVersion" },
+        "proposal_id": { "$ref": "#/$defs/id" },
+        "idempotency_key": { "$ref": "#/$defs/id" },
+        "tenant_id": { "$ref": "#/$defs/id" },
+        "candidate_id": { "$ref": "#/$defs/id" },
+        "subject_ref": { "$ref": "#/$defs/id" },
+        "identifier_type": { "$ref": "#/$defs/identifierType" },
+        "identifier_commitment": { "$ref": "#/$defs/digest" },
+        "category": { "$ref": "#/$defs/category" },
+        "signal_strength_band": { "$ref": "#/$defs/strengthBand" },
+        "evidence_tier": { "$ref": "#/$defs/evidenceTier" },
+        "evidence_snapshot_digest": { "$ref": "#/$defs/digest" },
+        "observed_window": { "$ref": "#/$defs/observedWindow" },
+        "purpose": { "$ref": "#/$defs/purpose" },
+        "expires_at": { "$ref": "#/$defs/timestamp" },
+        "policy_ref": { "$ref": "#/$defs/ref" },
+        "policy_version": { "$ref": "#/$defs/ref" },
+        "created_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "exchangeSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "signal_id",
+        "idempotency_key",
+        "origin_member_id",
+        "identifier_type",
+        "match_handle",
+        "category",
+        "signal_strength_band",
+        "evidence_tier",
+        "observed_window",
+        "purpose",
+        "policy_ref",
+        "policy_version",
+        "issued_at",
+        "expires_at",
+        "provenance_digest",
+        "authorization_artifact_id",
+        "origin_signature",
+        "origin_key_id"
+      ],
+      "properties": {
+        "schema_version": { "$ref": "#/$defs/contractVersion" },
+        "signal_id": { "$ref": "#/$defs/id" },
+        "idempotency_key": { "$ref": "#/$defs/id" },
+        "origin_member_id": { "$ref": "#/$defs/id" },
+        "identifier_type": { "$ref": "#/$defs/identifierType" },
+        "match_handle": { "$ref": "#/$defs/digest" },
+        "category": { "$ref": "#/$defs/category" },
+        "signal_strength_band": { "$ref": "#/$defs/strengthBand" },
+        "evidence_tier": { "$ref": "#/$defs/evidenceTier" },
+        "evidence_snapshot_digest": { "$ref": "#/$defs/digest" },
+        "observed_window": { "$ref": "#/$defs/observedWindow" },
+        "purpose": { "$ref": "#/$defs/purpose" },
+        "policy_ref": { "$ref": "#/$defs/ref" },
+        "policy_version": { "$ref": "#/$defs/ref" },
+        "issued_at": { "$ref": "#/$defs/timestamp" },
+        "expires_at": { "$ref": "#/$defs/timestamp" },
+        "provenance_digest": { "$ref": "#/$defs/digest" },
+        "authorization_artifact_id": { "$ref": "#/$defs/id" },
+        "origin_signature": { "$ref": "#/$defs/signature" },
+        "origin_key_id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "exchangeRevocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "revocation_id",
+        "signal_id",
+        "origin_member_id",
+        "reason",
+        "issued_at",
+        "origin_signature",
+        "origin_key_id"
+      ],
+      "properties": {
+        "schema_version": { "$ref": "#/$defs/contractVersion" },
+        "revocation_id": { "$ref": "#/$defs/id" },
+        "signal_id": { "$ref": "#/$defs/id" },
+        "origin_member_id": { "$ref": "#/$defs/id" },
+        "reason": {
+          "enum": [
+            "source_invalidated",
+            "retention_expired",
+            "member_paused",
+            "policy_withdrawn"
+          ]
+        },
+        "issued_at": { "$ref": "#/$defs/timestamp" },
+        "origin_signature": { "$ref": "#/$defs/signature" },
+        "origin_key_id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "matchLookupRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "lookup_id",
+        "tenant_id",
+        "local_subject_ref",
+        "local_case_ref",
+        "identifier_type",
+        "purpose",
+        "requested_at",
+        "subscription_expires_at"
+      ],
+      "properties": {
+        "schema_version": { "$ref": "#/$defs/contractVersion" },
+        "lookup_id": { "$ref": "#/$defs/id" },
+        "tenant_id": { "$ref": "#/$defs/id" },
+        "local_subject_ref": { "$ref": "#/$defs/id" },
+        "local_case_ref": { "$ref": "#/$defs/id" },
+        "identifier_type": { "$ref": "#/$defs/identifierType" },
+        "purpose": { "$ref": "#/$defs/activeLookupPurpose" },
+        "requested_at": { "$ref": "#/$defs/timestamp" },
+        "subscription_expires_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "exchangeDeliveryRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "delivery_id",
+        "member_id",
+        "delivered_at",
+        "broker_signature",
+        "broker_key_id"
+      ],
+      "properties": {
+        "schema_version": { "$ref": "#/$defs/contractVersion" },
+        "delivery_id": { "$ref": "#/$defs/id" },
+        "member_id": { "$ref": "#/$defs/id" },
+        "signal": { "$ref": "#/$defs/exchangeSignal" },
+        "revocation": { "$ref": "#/$defs/exchangeRevocation" },
+        "delivered_at": { "$ref": "#/$defs/timestamp" },
+        "broker_signature": { "$ref": "#/$defs/signature" },
+        "broker_key_id": { "$ref": "#/$defs/id" }
+      },
+      "oneOf": [
+        {
+          "properties": { "signal": {}, "revocation": {} },
+          "required": ["signal"],
+          "not": {
+            "properties": { "revocation": {} },
+            "required": ["revocation"]
+          }
+        },
+        {
+          "properties": { "signal": {}, "revocation": {} },
+          "required": ["revocation"],
+          "not": {
+            "properties": { "signal": {} },
+            "required": ["signal"]
+          }
+        }
+      ]
+    }
+  }
+}

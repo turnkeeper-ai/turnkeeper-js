@@ -399,6 +399,102 @@ export function validateExchangeRevocationV1(
   return { ok: true, value: raw as ExchangeRevocationV1 };
 }
 
+export function validateMatchLookupRequestV1(
+  raw: unknown,
+): ExchangeValidationResult<MatchLookupRequestV1> {
+  if (!isRecord(raw)) return fail("invalid_match_lookup", "not_an_object");
+  const prohibited = rejectDeep(raw);
+  if (prohibited) return prohibited;
+  const unknown = rejectUnknownKeys(raw, [
+    "schema_version",
+    "lookup_id",
+    "tenant_id",
+    "local_subject_ref",
+    "local_case_ref",
+    "identifier_type",
+    "purpose",
+    "requested_at",
+    "subscription_expires_at",
+  ]);
+  if (unknown) return unknown;
+  if (raw.schema_version !== EXCHANGE_CONTRACT_VERSION)
+    return fail("unsupported_schema_version");
+  for (const key of [
+    "lookup_id",
+    "tenant_id",
+    "local_subject_ref",
+    "local_case_ref",
+  ] as const) {
+    if (typeof raw[key] !== "string" || !ID.test(raw[key]))
+      return fail(`invalid_${key}`);
+  }
+  if (!enumValue(raw.identifier_type, IDENTIFIER_TYPES, "invalid_identifier_type"))
+    return fail("invalid_identifier_type");
+  if (
+    !enumValue(
+      raw.purpose,
+      ["local_investigation", "specialist_review"] as const,
+      "invalid_purpose",
+    )
+  )
+    return fail("invalid_purpose");
+  if (
+    !date(raw.requested_at) ||
+    !date(raw.subscription_expires_at) ||
+    Date.parse(raw.subscription_expires_at) <= Date.parse(raw.requested_at)
+  )
+    return fail("invalid_subscription_expiry");
+  return { ok: true, value: raw as MatchLookupRequestV1 };
+}
+
+export function validateExchangeDeliveryRecordV1(
+  raw: unknown,
+): ExchangeValidationResult<ExchangeDeliveryRecordV1> {
+  if (!isRecord(raw)) return fail("invalid_delivery", "not_an_object");
+  const prohibited = rejectDeep(raw);
+  if (prohibited) return prohibited;
+  const unknown = rejectUnknownKeys(raw, [
+    "schema_version",
+    "delivery_id",
+    "member_id",
+    "signal",
+    "revocation",
+    "delivered_at",
+    "broker_signature",
+    "broker_key_id",
+  ]);
+  if (unknown) return unknown;
+  if (raw.schema_version !== EXCHANGE_CONTRACT_VERSION)
+    return fail("unsupported_schema_version");
+  for (const key of ["delivery_id", "member_id", "broker_key_id"] as const) {
+    if (typeof raw[key] !== "string" || !ID.test(raw[key]))
+      return fail(`invalid_${key}`);
+  }
+  if (
+    !date(raw.delivered_at) ||
+    typeof raw.broker_signature !== "string" ||
+    !SIGNATURE.test(raw.broker_signature)
+  )
+    return fail("invalid_delivery_signature");
+  const carriesSignal = raw.signal !== undefined;
+  const carriesRevocation = raw.revocation !== undefined;
+  if (carriesSignal === carriesRevocation)
+    return fail("invalid_delivery_payload", "expected_exactly_one_protocol_object");
+  if (carriesSignal) {
+    const signal = validateExchangeSignalV1(raw.signal);
+    if (!signal.ok) return fail("invalid_delivery_signal", `${signal.code}: ${signal.detail ?? ""}`);
+  }
+  if (carriesRevocation) {
+    const revocation = validateExchangeRevocationV1(raw.revocation);
+    if (!revocation.ok)
+      return fail(
+        "invalid_delivery_revocation",
+        `${revocation.code}: ${revocation.detail ?? ""}`,
+      );
+  }
+  return { ok: true, value: raw as ExchangeDeliveryRecordV1 };
+}
+
 function canonicalize(value: unknown, seen: Set<object>): string {
   if (value === null) return "null";
   if (typeof value === "string") return JSON.stringify(value);

@@ -1,0 +1,141 @@
+{
+  "fixture_version": "2026-08-08",
+  "claim": "schema_conformant_synthetic",
+  "objects": {
+    "detector_candidate": {
+      "schema_version": "1",
+      "candidate_id": "candidate_00000001",
+      "idempotency_key": "candidate_idempotency_01",
+      "tenant_id": "tenant_00000001",
+      "subject_ref": "subject_00000001",
+      "category": "boundary_testing",
+      "detector": {
+        "detector_id": "synthetic-detector",
+        "detector_version": "1.0.0",
+        "detector_config_ref": "detector_config_01",
+        "calibration_ref": "calibration_0001"
+      },
+      "window": {
+        "aggregation_window_ref": "window_synthetic_01",
+        "started_at": "2026-08-08T00:00:00.000Z",
+        "ended_at": "2026-08-08T00:03:00.000Z",
+        "observation_count": 4
+      },
+      "signal": {
+        "method": "synthetic_fixture",
+        "aggregation_name": "bounded_window",
+        "signal_strength_band": "elevated",
+        "threshold_profile_ref": "threshold_profile_01"
+      },
+      "evidence": {
+        "evidence_ref": "evidence:synthetic:01",
+        "evidence_manifest_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "evidence_tier": "window_available"
+      },
+      "observed_at": "2026-08-08T00:03:00.000Z",
+      "received_at": "2026-08-08T00:03:01.000Z"
+    },
+    "publish_proposal": {
+      "schema_version": "2026-08-08",
+      "proposal_id": "proposal_00000001",
+      "idempotency_key": "proposal_idempotency_01",
+      "tenant_id": "tenant_00000001",
+      "candidate_id": "candidate_00000001",
+      "subject_ref": "subject_00000001",
+      "identifier_type": "verified_email",
+      "identifier_commitment": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "category": "boundary_testing",
+      "signal_strength_band": "elevated",
+      "evidence_tier": "window_available",
+      "evidence_snapshot_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "observed_window": {
+        "started_at": "2026-08-08T00:00:00.000Z",
+        "ended_at": "2026-08-08T00:03:00.000Z"
+      },
+      "purpose": "local_investigation",
+      "expires_at": "2026-08-15T00:05:00.000Z",
+      "policy_ref": "exchange_policy_v1",
+      "policy_version": "2026-08-08",
+      "created_at": "2026-08-08T00:04:00.000Z"
+    },
+    "exchange_signal": {
+      "schema_version": "2026-08-08",
+      "signal_id": "signal_synthetic_01",
+      "idempotency_key": "signal_idempotency_01",
+      "origin_member_id": "member_synthetic_a",
+      "identifier_type": "verified_email",
+      "match_handle": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "category": "boundary_testing",
+      "signal_strength_band": "elevated",
+      "evidence_tier": "window_available",
+      "evidence_snapshot_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "observed_window": {
+        "started_at": "2026-08-08T00:00:00.000Z",
+        "ended_at": "2026-08-08T00:03:00.000Z"
+      },
+      "purpose": "local_investigation",
+      "policy_ref": "exchange_policy_v1",
+      "policy_version": "2026-08-08",
+      "issued_at": "2026-08-08T00:05:00.000Z",
+      "expires_at": "2026-08-15T00:05:00.000Z",
+      "provenance_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "authorization_artifact_id": "authz_synthetic_01",
+      "origin_signature": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "origin_key_id": "member_key_synthetic_a"
+    },
+    "exchange_revocation": {
+      "schema_version": "2026-08-08",
+      "revocation_id": "revocation_synthetic_01",
+      "signal_id": "signal_synthetic_01",
+      "origin_member_id": "member_synthetic_a",
+      "reason": "source_invalidated",
+      "issued_at": "2026-08-09T10:00:00.000Z",
+      "origin_signature": "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
+      "origin_key_id": "member_key_synthetic_a"
+    },
+    "match_lookup_request": {
+      "schema_version": "2026-08-08",
+      "lookup_id": "lookup_synthetic_01",
+      "tenant_id": "tenant_00000002",
+      "local_subject_ref": "subject_synthetic_02",
+      "local_case_ref": "case_synthetic_0002",
+      "identifier_type": "verified_email",
+      "purpose": "local_investigation",
+      "requested_at": "2026-08-08T00:05:30.000Z",
+      "subscription_expires_at": "2026-08-15T00:05:30.000Z"
+    },
+    "exchange_delivery_record": {
+      "schema_version": "2026-08-08",
+      "delivery_id": "delivery_synthetic_01",
+      "member_id": "member_synthetic_b",
+      "signal": {
+        "schema_version": "2026-08-08",
+        "signal_id": "signal_synthetic_01",
+        "idempotency_key": "signal_idempotency_01",
+        "origin_member_id": "member_synthetic_a",
+        "identifier_type": "verified_email",
+        "match_handle": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "category": "boundary_testing",
+        "signal_strength_band": "elevated",
+        "evidence_tier": "window_available",
+        "evidence_snapshot_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "observed_window": {
+          "started_at": "2026-08-08T00:00:00.000Z",
+          "ended_at": "2026-08-08T00:03:00.000Z"
+        },
+        "purpose": "local_investigation",
+        "policy_ref": "exchange_policy_v1",
+        "policy_version": "2026-08-08",
+        "issued_at": "2026-08-08T00:05:00.000Z",
+        "expires_at": "2026-08-15T00:05:00.000Z",
+        "provenance_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "authorization_artifact_id": "authz_synthetic_01",
+        "origin_signature": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "origin_key_id": "member_key_synthetic_a"
+      },
+      "delivered_at": "2026-08-08T00:06:00.000Z",
+      "broker_signature": "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+      "broker_key_id": "broker_key_synthetic_01"
+    }
+  }
+}
