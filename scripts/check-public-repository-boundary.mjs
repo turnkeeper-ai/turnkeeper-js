@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 const DOCUMENT_PATH = /\.(?:md|mdx|txt)$/iu;
@@ -41,7 +41,7 @@ export function trackedDocumentationEntries() {
   const paths = execFileSync("git", ["ls-files", "-z"], { encoding: "utf8" })
     .split("\0")
     .filter(Boolean)
-    .filter((path) => DOCUMENT_PATH.test(path));
+    .filter((path) => DOCUMENT_PATH.test(path) && existsSync(path));
 
   return paths.map((path) => ({ path, content: readFileSync(path, "utf8") }));
 }

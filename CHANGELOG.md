@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.2.0-alpha.0 - 2026-08-22
+
+- Retire the legacy public Replay, Control, policy, approval, CLI, MCP, agent-skill, and generic
+  example surfaces. This is a breaking alpha release; hosted Turnkeeper operations remain private
+  and unchanged.
+- Retain the zero-dependency Ward SDK, claim-safe adapter, safety-exchange schemas, synthetic
+  fixtures, and conformance documentation as the sole public developer surface.
 - Add `@turnkeeper/adapter-sentinel`, a claim-safe zero-dependency mapper from
   Sentinel-like window candidates to Turnkeeper `DetectorCandidate` metadata (not a Roblox
   partnership or endorsement).

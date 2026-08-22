@@ -1,20 +1,17 @@
-# Turnkeeper SDK
+# Turnkeeper Ward public contracts
 
-Public developer tooling for building governed AI-agent workflows with Turnkeeper.
+Public, privacy-minimized developer contracts for Turnkeeper Ward safety intelligence.
 
 ```text
-packages/sdk                 Replay and bounded Control clients
-packages/cli                 Scaffolding, policy validation, tests, and integration inspection
-packages/mcp                 Development-time MCP tools
+packages/sdk                 Ward contracts and validators
 packages/adapter-sentinel    Claim-safe Sentinel-like → DetectorCandidate mapper
-skills/                      Turnkeeper agent-builder skill
-examples/                    Synthetic, runnable agent integrations
-docs/                        Public integration and package documentation
+spec/                         Dated safety-exchange schemas
+docs/                         Protocol, conformance, and package documentation
 ```
 
-The repository contains client libraries and developer tooling only. Hosted dashboards,
-organization management, approvals, audit storage, billing, and production API implementations
-remain in the private hosted-platform repository.
+This repository contains public contracts and developer tooling only. Hosted dashboards,
+organization management, case review, authorization, audit storage, billing, and production API
+implementations remain in the private hosted-platform repository.
 
 ## Development
 
@@ -35,26 +32,19 @@ for reproducible installs; the moving `next` channel is available for deliberate
 tracking.
 
 ```bash
-npm install @turnkeeper/sdk@0.1.0-alpha.7
-npm install --save-dev @turnkeeper/cli@0.1.0-alpha.7
-TURNKEEPER_WORKSPACE_ROOT="$PWD" npx -y @turnkeeper/mcp@0.1.0-alpha.7
-npm install @turnkeeper/adapter-sentinel@0.1.0-alpha.7
+npm install @turnkeeper/sdk@0.2.0-alpha.0 @turnkeeper/adapter-sentinel@0.2.0-alpha.0
 ```
 
-Equivalent moving-channel package specs are `@turnkeeper/sdk@next`, `@turnkeeper/cli@next`,
-`@turnkeeper/mcp@next`, and `@turnkeeper/adapter-sentinel@next`. Do not use an unversioned install
-until the project explicitly promotes a release to `latest`.
+Equivalent moving-channel package specs are `@turnkeeper/sdk@next` and
+`@turnkeeper/adapter-sentinel@next`. Do not use an unversioned install until the project
+explicitly promotes a release to `latest`.
 
 ## Packages
 
 - [`@turnkeeper/sdk`](packages/sdk/README.md)
-- [`@turnkeeper/cli`](packages/cli/README.md)
-- [`@turnkeeper/mcp`](packages/mcp/README.md)
 - [`@turnkeeper/adapter-sentinel`](packages/adapter-sentinel/README.md)
 
-See [bounded Control checks](docs/control.md), [MCP setup](docs/mcp.md), and the
-[agent-builder skill](docs/agent-builder-skill.md). Maintainers should use the
-[public package release process](docs/releasing.md).
+Maintainers should use the [public package release process](docs/releasing.md).
 
 For the privacy-minimized Ward exchange contracts, read the
 [Safety Exchange Protocol v0.1 working draft](docs/safety-exchange-protocol-v0.1.md), its linked
@@ -63,26 +53,11 @@ operational profiles, and the
 SDK validates structural contracts with synthetic data. Cryptographic helpers, live membership,
 durable delivery, operational conformance, and multi-company collaboration remain roadmap.
 
-## Examples
+## Privacy and safety
 
-See the [synthetic examples index](examples/README.md) for every current scenario, public surface,
-run status, and focused verification command.
-
-- [`examples/customer-support-agent`](examples/customer-support-agent)
-- [`examples/booking-agent`](examples/booking-agent)
-- [`examples/account-management-agent`](examples/account-management-agent)
-- [`examples/appointment-create`](examples/appointment-create) —
-  persisted proposal, review hold, exact-binding revalidation, and unknown-outcome reconciliation
-- [`examples/durable-outbox-worker`](examples/durable-outbox-worker) —
-  documentation-only durable Replay outbox pattern
-- [`examples/financial-services-refund`](examples/financial-services-refund) —
-  bounded `support.refund` Control contract with local fail-closed simulation
-- [`examples/support-escalation`](examples/support-escalation) —
-  bounded `support.escalation` Control contract with local fail-closed simulation
-- [`examples/account-contact-change`](examples/account-contact-change) —
-  bounded `account.contact_information.change` Control contract with local fail-closed simulation
-- [`examples/self-hosted-safeguard`](examples/self-hosted-safeguard) —
-  provider-neutral Safeguard classification to `model.output.safety` Control and Replay lifecycle
+The retained contracts are synthetic-first and advisory. They accept opaque references and bounded
+metadata only. Do not send raw messages, attachments, direct identifiers, customer credentials, or
+free-form detector output. A valid candidate is not a review decision or authorization to act.
 
 ## Community
 
@@ -103,5 +78,5 @@ documentation improvements, and feature proposals.
 
 ## Security
 
-Keep Turnkeeper credentials server-side. Replay accepts metadata only, and a model-generated tool
-call is a proposal—not authorization to execute a real-world action. See [SECURITY.md](SECURITY.md).
+Keep credentials, raw content, and direct identifiers out of public contract inputs. See
+[SECURITY.md](SECURITY.md) and [docs/privacy.md](docs/privacy.md).

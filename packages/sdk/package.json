@@ -1,7 +1,7 @@
 {
   "name": "@turnkeeper/sdk",
-  "version": "0.1.0-alpha.7",
-  "description": "Server-side TypeScript SDK for Turnkeeper Replay and bounded Control checks.",
+  "version": "0.2.0-alpha.0",
+  "description": "TypeScript contracts and validators for privacy-minimized Turnkeeper Ward safety intelligence.",
   "license": "Apache-2.0",
   "type": "module",
   "sideEffects": false,
@@ -37,11 +37,9 @@
   },
   "homepage": "https://github.com/turnkeeper-ai/turnkeeper-js#readme",
   "keywords": [
-    "ai-agents",
-    "audit",
-    "governance",
-    "human-in-the-loop",
-    "replay",
+    "interoperability",
+    "privacy-minimized",
+    "safety-intelligence",
     "turnkeeper"
   ],
   "scripts": {
@@ -51,7 +49,5 @@
     "package:check": "node scripts/check-package-contents.mjs",
     "prepack": "npm run build"
   },
-  "dependencies": {
-    "zod": "4.4.3"
-  }
+  "dependencies": {}
 }

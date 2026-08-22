@@ -13,7 +13,7 @@ Closes #
 
 ## Safety
 
-- [ ] Replay remains metadata-only.
+- [ ] Ward inputs remain privacy-minimized and advisory only.
 - [ ] No secret, customer identifier, payload, internal runbook, or private strategy is included.
 - [ ] Errors and fixtures are synthetic and safe.
 - [ ] The change does not claim private or unshipped hosted behavior.

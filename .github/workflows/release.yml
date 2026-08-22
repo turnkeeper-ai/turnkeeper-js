@@ -72,8 +72,6 @@ jobs:
           const readManifest = (path) => JSON.parse(readFileSync(path, "utf8"));
           const root = readManifest("package.json");
           const sdk = readManifest("packages/sdk/package.json");
-          const cli = readManifest("packages/cli/package.json");
-          const mcp = readManifest("packages/mcp/package.json");
           const adapterSentinel = readManifest("packages/adapter-sentinel/package.json");
           const version = root.version;
 
@@ -81,12 +79,8 @@ jobs:
           assert.equal(process.env.RELEASE_TAG, `v${version}`, "tag must match the root version");
           assert.equal(root.packageManager, "npm@11.6.2", "unexpected package manager");
           assert.equal(sdk.version, version, "SDK version is not aligned");
-          assert.equal(cli.version, version, "CLI version is not aligned");
-          assert.equal(mcp.version, version, "MCP version is not aligned");
           assert.equal(adapterSentinel.version, version, "adapter-sentinel version is not aligned");
-          assert.equal(cli.dependencies?.["@turnkeeper/sdk"], version, "CLI must pin this SDK version");
-          assert.equal(mcp.dependencies?.["@turnkeeper/sdk"], version, "MCP must pin this SDK version");
-          assert.equal(mcp.dependencies?.["@turnkeeper/cli"], version, "MCP must pin this CLI version");
+          assert.deepEqual(sdk.dependencies ?? {}, {}, "SDK must remain zero-dependency");
           assert.deepEqual(
             adapterSentinel.dependencies ?? {},
             {},
@@ -108,30 +102,16 @@ jobs:
           mkdir -p release-artifacts
 
           npm pack --workspace @turnkeeper/sdk --ignore-scripts --pack-destination release-artifacts
-          npm pack --workspace @turnkeeper/cli --ignore-scripts --pack-destination release-artifacts
-          npm pack --workspace @turnkeeper/mcp --ignore-scripts --pack-destination release-artifacts
           npm pack --workspace @turnkeeper/adapter-sentinel --ignore-scripts --pack-destination release-artifacts
 
           npm sbom --workspace @turnkeeper/sdk --sbom-format cyclonedx > release-artifacts/turnkeeper-sdk.cdx.json
-          npm sbom --workspace @turnkeeper/cli --sbom-format cyclonedx > release-artifacts/turnkeeper-cli.cdx.json
-          npm sbom --workspace @turnkeeper/mcp --sbom-format cyclonedx > release-artifacts/turnkeeper-mcp.cdx.json
           npm sbom --workspace @turnkeeper/adapter-sentinel --sbom-format cyclonedx > release-artifacts/turnkeeper-adapter-sentinel.cdx.json
-          cp spec/replay-2026-07-09.schema.json release-artifacts/
-          cp spec/replay-2026-07-27.schema.json release-artifacts/
-          cp spec/control-check-request-2026-07-16.schema.json release-artifacts/
-          cp spec/control-check-response-2026-07-16.schema.json release-artifacts/
-          cp spec/control-review-response-2026-07-16.schema.json release-artifacts/
+          cp spec/safety-exchange-2026-08-08.schema.json release-artifacts/
 
           for artifact in \
             "release-artifacts/turnkeeper-sdk-${version}.tgz" \
-            "release-artifacts/turnkeeper-cli-${version}.tgz" \
-            "release-artifacts/turnkeeper-mcp-${version}.tgz" \
             "release-artifacts/turnkeeper-adapter-sentinel-${version}.tgz" \
-            "release-artifacts/replay-2026-07-09.schema.json" \
-            "release-artifacts/replay-2026-07-27.schema.json" \
-            "release-artifacts/control-check-request-2026-07-16.schema.json" \
-            "release-artifacts/control-check-response-2026-07-16.schema.json" \
-            "release-artifacts/control-review-response-2026-07-16.schema.json"; do
+            "release-artifacts/safety-exchange-2026-08-08.schema.json"; do
             test -f "${artifact}"
           done
 
@@ -232,8 +212,6 @@ jobs:
           }
 
           publish_or_verify "@turnkeeper/sdk" "./release-artifacts/turnkeeper-sdk-${version}.tgz"
-          publish_or_verify "@turnkeeper/cli" "./release-artifacts/turnkeeper-cli-${version}.tgz"
-          publish_or_verify "@turnkeeper/mcp" "./release-artifacts/turnkeeper-mcp-${version}.tgz"
           publish_or_verify "@turnkeeper/adapter-sentinel" "./release-artifacts/turnkeeper-adapter-sentinel-${version}.tgz"
 
       - name: Verify clean registry consumers and provenance
@@ -252,25 +230,12 @@ jobs:
             --registry="${registry}" \
             --prefix "${consumer}" \
             "@turnkeeper/sdk@${version}" \
-            "@turnkeeper/cli@${version}" \
-            "@turnkeeper/mcp@${version}" \
             "@turnkeeper/adapter-sentinel@${version}"
 
           (
             cd "${consumer}"
-            node --input-type=module -e 'const sdk = await import("@turnkeeper/sdk"); if (Object.keys(sdk).length === 0) throw new Error("SDK exports are empty");'
+            node --input-type=module -e 'const sdk = await import("@turnkeeper/sdk"); if (sdk.EXCHANGE_CONTRACT_VERSION !== "2026-08-08" || typeof sdk.validateDetectorCandidateV1 !== "function") throw new Error("SDK exports are incomplete");'
             node --input-type=module -e 'const adapter = await import("@turnkeeper/adapter-sentinel"); if (typeof adapter.mapRobloxSentinelCandidate !== "function") throw new Error("adapter-sentinel exports are incomplete");'
-            ./node_modules/.bin/turnkeeper --help
-
-            set +e
-            TURNKEEPER_WORKSPACE_ROOT="${consumer}" timeout 10s ./node_modules/.bin/turnkeeper-mcp 2>mcp.stderr
-            mcp_status=$?
-            set -e
-            if [[ "${mcp_status}" -ne 0 && "${mcp_status}" -ne 124 ]]; then
-              cat mcp.stderr >&2
-              exit "${mcp_status}"
-            fi
-            grep -q "Turnkeeper MCP server running on stdio." mcp.stderr
 
             npm audit signatures --json > audit-signatures.json
           )
@@ -285,7 +250,7 @@ jobs:
 
           NODE
 
-          for package_name in @turnkeeper/sdk @turnkeeper/cli @turnkeeper/mcp @turnkeeper/adapter-sentinel; do
+          for package_name in @turnkeeper/sdk @turnkeeper/adapter-sentinel; do
             test "$(npm view "${package_name}" dist-tags.next --registry="${registry}")" = "${version}"
             test "$(npm view "${package_name}@${version}" dist.attestations.provenance.predicateType --registry="${registry}")" = "https://slsa.dev/provenance/v1"
           done

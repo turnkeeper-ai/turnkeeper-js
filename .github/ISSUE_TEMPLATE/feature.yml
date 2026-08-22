@@ -1,5 +1,5 @@
 name: Feature proposal
-description: Propose a new or changed public SDK, CLI, MCP, skill, example, or documentation surface.
+description: Propose a new or changed public Ward contract, detector adapter, fixture, or documentation surface.
 title: "proposal: "
 labels:
   - enhancement
@@ -14,10 +14,8 @@ body:
       label: Proposed surface
       options:
         - SDK
-        - CLI
-        - MCP
-        - Agent-builder skill
-        - Example
+        - Detector adapter
+        - Safety-exchange schema or fixture
         - Specification or documentation
         - Contributor tooling
     validations:
@@ -46,7 +44,7 @@ body:
     id: compatibility
     attributes:
       label: Compatibility and safety boundaries
-      description: Address API versioning, metadata-only Replay, fail-closed Control, secret safety, and package boundaries where relevant.
+      description: Address dated contract compatibility, privacy minimization, provenance, advisory boundaries, secret safety, and package boundaries where relevant.
     validations:
       required: true
   - type: textarea

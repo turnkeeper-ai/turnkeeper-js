@@ -11,13 +11,11 @@ body:
       options:
         - Repository onboarding
         - SDK
-        - CLI
-        - MCP
-        - Agent-builder skill
-        - Replay
-        - Control
+        - Detector adapter
+        - Safety-exchange protocol
+        - Synthetic conformance fixtures
         - Privacy or security
-        - Example application
+        - Release documentation
     validations:
       required: true
   - type: input

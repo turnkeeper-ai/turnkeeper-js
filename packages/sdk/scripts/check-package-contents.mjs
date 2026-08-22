@@ -5,7 +5,7 @@ import process from "node:process";
 const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 if (packageJson.private === true) throw new Error("The public SDK package must not be private.");
 if (packageJson.license !== "Apache-2.0") throw new Error("The SDK must use Apache-2.0.");
-if (JSON.stringify(packageJson.dependencies ?? {}) !== JSON.stringify({ zod: "4.4.3" })) {
+if (Object.keys(packageJson.dependencies ?? {}).length !== 0) {
   throw new Error("The SDK runtime dependency allowlist changed.");
 }
 if (!(packageJson.files ?? []).includes("LICENSE")) throw new Error("LICENSE must be packaged.");

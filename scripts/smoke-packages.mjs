@@ -41,8 +41,6 @@ try {
   const tarballs = new Map();
   for (const workspace of [
     "@turnkeeper/sdk",
-    "@turnkeeper/cli",
-    "@turnkeeper/mcp",
     "@turnkeeper/adapter-sentinel",
   ]) {
     const report = JSON.parse(
@@ -75,7 +73,7 @@ try {
     [
       "--input-type=module",
       "-e",
-      'import("@turnkeeper/sdk").then((module) => { if (module.REPLAY_API_VERSION !== "2026-07-27" || typeof module.ControlClient !== "function") process.exit(1); });',
+      'import("@turnkeeper/sdk").then((module) => { if (module.EXCHANGE_CONTRACT_VERSION !== "2026-08-08" || typeof module.validateDetectorCandidateV1 !== "function") process.exit(1); });',
     ],
     sdkConsumer,
   );
@@ -91,7 +89,7 @@ try {
     [
       "--input-type=module",
       "-e",
-      'import("@turnkeeper/sdk").then((module) => { if (module.REPLAY_API_VERSION !== "2026-07-27" || typeof module.ControlClient !== "function") process.exit(1); });',
+      'import("@turnkeeper/sdk").then((module) => { if (module.EXCHANGE_CONTRACT_VERSION !== "2026-08-08" || typeof module.validateDetectorCandidateV1 !== "function") process.exit(1); });',
     ],
     consumer,
   );
@@ -107,43 +105,8 @@ try {
   );
   if (adapter.stderr) throw new Error("adapter-sentinel import smoke emitted stderr.");
 
-  const cli = node(
-    [
-      path.join(
-        consumer,
-        "node_modules",
-        "@turnkeeper",
-        "cli",
-        "dist",
-        "bin.js",
-      ),
-      "--help",
-    ],
-    consumer,
-  );
-  if (!cli.stdout.includes("test-policies"))
-    throw new Error("CLI help smoke failed.");
-
-  const mcp = node(
-    [
-      path.join(
-        consumer,
-        "node_modules",
-        "@turnkeeper",
-        "mcp",
-        "dist",
-        "bin.js",
-      ),
-    ],
-    consumer,
-    { ...process.env, TURNKEEPER_WORKSPACE_ROOT: consumer },
-  );
-  if (!mcp.stderr.includes("Turnkeeper MCP server running on stdio.")) {
-    throw new Error("MCP stdio smoke failed.");
-  }
-
   console.log(
-    "Standalone SDK plus combined prerelease SDK, CLI, MCP, and adapter-sentinel package smoke verified. Release CI verifies CLI and MCP independently after their registry dependencies are available.",
+    "Standalone SDK plus combined prerelease SDK and adapter-sentinel package smoke verified.",
   );
 } finally {
   await rm(root, { force: true, recursive: true });

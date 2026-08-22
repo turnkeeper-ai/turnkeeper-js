@@ -1,9 +1,8 @@
 # `@turnkeeper/sdk`
 
-Server-side TypeScript SDK for Turnkeeper Replay and bounded Control checks.
-
-The package is ESM-only and supports Node.js 22.20 and Node.js 24. Keep project API keys and action
-binding secrets in a server-side secret manager.
+TypeScript contracts and validators for privacy-minimized Turnkeeper Ward safety intelligence.
+The package validates structural input locally; it does not make a network call, hold credentials,
+create a case, or authorize an action.
 
 ## Install
 
@@ -11,136 +10,72 @@ Pin the current alpha explicitly because npm's unversioned `latest` channel stil
 `0.1.0-alpha.2`:
 
 ```sh
-npm install @turnkeeper/sdk@0.1.0-alpha.7
+npm install @turnkeeper/sdk@0.2.0-alpha.0
 ```
 
 Use `@turnkeeper/sdk@next` only when intentionally tracking the moving prerelease channel.
 
-## Replay
-
-Replay records metadata-only lifecycle events. Never send prompts, completions, transcripts,
-message text, tool arguments or results, PII, credentials, URLs, or arbitrary metadata.
+## Validate a detector candidate
 
 ```ts
-import {
-  REPLAY_API_VERSION,
-  TurnkeeperClient,
-  parseOpaqueReplayId,
-  type ReplayBatch,
-} from "@turnkeeper/sdk";
+import { validateDetectorCandidateV1 } from "@turnkeeper/sdk";
 
-const turnkeeper = new TurnkeeperClient({
-  apiKey: process.env.TURNKEEPER_API_KEY!,
-  baseUrl: process.env.TURNKEEPER_BASE_URL!,
+const result = validateDetectorCandidateV1({
+  schema_version: "1",
+  candidate_id: "candidate_demo_0001",
+  idempotency_key: "candidate_demo_retry_0001",
+  tenant_id: "tenant_demo_0001",
+  subject_ref: "subject_demo_0001",
+  category: "secrecy_request",
+  detector: {
+    detector_id: "detector_demo",
+    detector_version: "2026-08-08",
+    detector_config_ref: "config_demo_0001",
+    calibration_ref: "calibration_demo_0001",
+  },
+  window: {
+    aggregation_window_ref: "window_demo_0001",
+    started_at: "2026-08-08T00:00:00.000Z",
+    ended_at: "2026-08-08T00:05:00.000Z",
+    observation_count: 2,
+  },
+  signal: {
+    method: "bounded_aggregation",
+    aggregation_name: "window_count",
+    signal_strength_band: "elevated",
+    threshold_profile_ref: "threshold_demo_0001",
+  },
+  evidence: {
+    evidence_ref: "evidence_demo_0001",
+    evidence_tier: "signal_only",
+  },
+  observed_at: "2026-08-08T00:05:00.000Z",
+  received_at: "2026-08-08T00:05:01.000Z",
 });
 
-const batch: ReplayBatch = {
-  events: [
-    {
-      api_version: REPLAY_API_VERSION,
-      source_event_id: parseOpaqueReplayId("1".repeat(64)),
-      type: "turn.decision_recorded",
-      occurred_at: new Date().toISOString(),
-      conversation_external_id: parseOpaqueReplayId("a".repeat(64)),
-      turn_external_id: parseOpaqueReplayId("b".repeat(64)),
-      event_index: 0,
-      data: { decision_code: "manual_review" },
-      privacy: { mode: "metadata_only", key_version: 1 },
-    },
-  ],
-};
-
-// Call from a durable background worker, not the customer-response path.
-await turnkeeper.replay.ingestBatch(batch);
+if (!result.ok) throw new Error(result.code);
 ```
 
-The Replay client never retries automatically. Persist events in a durable outbox and use
-`classifyRetry` to decide whether a failed delivery should be retried or quarantined.
+Use the validated value only with an approved integration that derives tenant ownership and
+authorization from its authenticated server context.
 
-## Control
+## Exports
 
-Treat model tool calls as proposals. Authorization, trusted roles, exact parameter validation,
-policy checks, approval state, and execution must remain on the server.
+- Ward detector-candidate, publish-proposal, exchange-signal, revocation, and delivery validators.
+- Private-match protocol types and validators.
+- Contract constants including `EXCHANGE_CONTRACT_VERSION`.
 
-```ts
-import {
-  ACTION_CONTEXT_SCHEMA_VERSION,
-  ControlClient,
-  generatePolicy,
-  type ActionContext,
-} from "@turnkeeper/sdk";
+The complete wire contract and synthetic fixtures are in the
+[Safety Exchange Protocol](../../docs/safety-exchange-protocol-v0.1.md) and
+[conformance guide](../../docs/safety-exchange-conformance-v0.1.md).
 
-const policy = generatePolicy({
-  actionName: "issue_refund",
-  allowedRoles: ["support_agent"],
-  approvalRequired: true,
-  parameterRestrictions: [
-    { kind: "required", parameter: "order_id" },
-    { kind: "max_number", parameter: "amount", maximum: 500 },
-  ],
-  requiredConditions: [
-    { operator: "gte", signalKey: "amount", value: 100, valueType: "number" },
-  ],
-  riskLevel: "high",
-});
+## Privacy and safety
 
-const action: ActionContext = {
-  schemaVersion: ACTION_CONTEXT_SCHEMA_VERSION,
-  actionName: "issue_refund",
-  actorId: authenticatedActor.id,
-  actorRoles: authenticatedActor.roles,
-  tenantId: authenticatedTenant.id,
-  projectId: authenticatedProject.id,
-  environment: "production",
-  userId: affectedUser.id,
-  conversationId: conversation.id,
-  turnId: turn.id,
-  proposalVersion: 1,
-  parameters: validatedProposal,
-  signals: { amount: validatedProposal.amount },
-};
-
-const control = new ControlClient({
-  apiKey: process.env.TURNKEEPER_API_KEY!,
-  baseUrl: process.env.TURNKEEPER_BASE_URL!,
-});
-
-const result = await control.check(policy, action, {
-  bindingSecret: process.env.TURNKEEPER_BINDING_SECRET!,
-});
-
-if (result.decision === "block" || result.decision === "review") {
-  // Stop. Persist the decision and review reference. Never execute yet.
-  return result;
-}
-
-// Execute only the exact immutable proposal that produced result.actionBinding.
-```
-
-`ControlClient` rejects unmatched hosted decisions, malformed or uncorrelated evidence, request
-hash mismatches, and any hosted decision that disagrees with the local policy bundle. It does not
-execute tools or resume approvals.
-
-Local validation errors expose safe field diagnostics as `issues: [{ path, code }]` and never
-include rejected values. Invalid `TurnkeeperClient` options throw `TurnkeeperValidationError` with
-the top-level code `invalid_client_configuration`; invalid Replay inputs retain
-`invalid_replay_input`. `GovernanceInputError` uses its operation-specific top-level code and adds
-the same sanitized `issues` shape for schema failures.
-
-When a durable worker revisits a paused proposal, retrieve the project-scoped review before doing
-anything else:
-
-```ts
-const review = await control.getReview(persistedReviewId);
-
-if (review.status === "open") return;
-if (review.status !== "approved") return permanentlyStopProposal();
-
-// Reload and revalidate the exact immutable proposal before executing it.
-```
-
-The API key requires `reviews:manage`. Review decisions remain human dashboard actions; SDK code
-cannot approve its own request.
+- Provide opaque customer-controlled references, not raw content or direct identifiers.
+- Validators reject prohibited content-shaped keys, unexpected fields, invalid provenance, and
+  invalid windows.
+- Validation is not an enforcement decision, a hosted API call, or permission to share a signal
+  with another organization.
 
 ## Development
 

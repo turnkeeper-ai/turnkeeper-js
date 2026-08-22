@@ -1,8 +1,8 @@
 # Contributing
 
-This monorepo contains the public SDK, CLI, MCP server, agent-builder skill, and synthetic examples.
-Changes must preserve the public/private repository boundary, Replay metadata allowlist,
-fail-closed Control behavior, deterministic event identity, and secret-safe errors.
+This monorepo contains the public Ward contract SDK, claim-safe detector adapter, dated schemas,
+synthetic fixtures, and developer documentation. Changes must preserve privacy-minimized contracts,
+provenance, bounded failure behavior, synthetic fixtures, and secret-safe errors.
 
 ## Choose work
 
@@ -20,7 +20,7 @@ one package or public contract. It identifies dependency direction, contract own
 the files that must stay synchronized.
 
 - Use the bug form for reproducible defects.
-- Use the documentation form for docs and example gaps.
+- Use the documentation form for docs and synthetic-fixture gaps.
 - Open a feature proposal before implementing a new public command, tool, export, or contract.
 - Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
 
@@ -60,26 +60,16 @@ repository; this map does not add or rename any package script.
 
 | Area you changed | Nearest focused command |
 | --- | --- |
-| SDK (`packages/sdk`) | `npm run typecheck --workspace @turnkeeper/sdk` then `npm run test --workspace @turnkeeper/sdk` and `npm run package:check --workspace @turnkeeper/sdk` |
-| CLI (`packages/cli`) | `npm run check --workspace @turnkeeper/cli` (typecheck + test; test builds), then `npm run package:check --workspace @turnkeeper/cli` for package contents |
-| MCP server (`packages/mcp`) | `npm run check --workspace @turnkeeper/mcp` (typecheck + test; test builds), then `npm run package:check --workspace @turnkeeper/mcp` for package contents |
-| Example: account-management-agent | `npm run test --workspace @turnkeeper/example-account-management-agent` |
-| Example: booking-agent | `npm run test --workspace @turnkeeper/example-booking-agent` |
-| Example: customer-support-agent | `npm run test --workspace @turnkeeper/example-customer-support-agent` |
-| Example: financial-services-refund | `npm run test --workspace @turnkeeper/example-financial-services-refund` |
-| Example: durable-outbox-worker | Docs-only example (`examples/durable-outbox-worker/README.md`); no package script — rely on `npm run check` |
-| Agent-builder skill (`skills/turnkeeper-agent-builder`) | `node scripts/validate-skill.mjs` |
+| Ward SDK (`packages/sdk`) | `npm run typecheck --workspace @turnkeeper/sdk` then `npm run test --workspace @turnkeeper/sdk` and `npm run package:check --workspace @turnkeeper/sdk` |
+| Detector adapter (`packages/adapter-sentinel`) | `npm run typecheck --workspace @turnkeeper/adapter-sentinel` then `npm run test --workspace @turnkeeper/adapter-sentinel` and `npm run package:check --workspace @turnkeeper/adapter-sentinel` |
 | Package contents (any published package) | `npm run smoke:packages` (or `npm run package:check --workspaces --if-present`) |
 | Documentation-only changes | No focused package script; confirm links and formatting, then run `npm run check` |
 
 Focused commands speed up iteration but do not replace the gate. `npm run check` remains the
 required final command before review — it runs build, workspace typecheck, workspace tests,
-package-content checks, `npm run smoke:packages`, and `node scripts/validate-skill.mjs`.
+package-content checks, package smoke checks, and the public-surface validator.
 
 Use Node.js 22.20 or Node.js 24 and npm 11 for both focused commands and the gate.
-
-On Windows, the CLI and MCP package tests exercise link-boundary behavior using directory
-junctions, so they run without Developer Mode or administrator-only symbolic-link privileges.
 
 ### Environment troubleshooting
 
@@ -93,10 +83,8 @@ node -p '`${process.platform} ${process.arch}`'
 
 After changing Node installations or CPU architecture, run `npm ci` again. It recreates
 `node_modules` from the committed lockfile; do not regenerate `package-lock.json` to conceal a
-runtime mismatch. On Windows, the link-boundary tests use directory junctions so they do not
-require Developer Mode or administrator-only symbolic-link privileges. If a supported Windows
-environment still reports `EPERM`, include the command, runtime values above, and relevant policy
-restrictions in the pull request instead of skipping the test.
+runtime mismatch. If a supported environment reports `EPERM`, include the command, runtime values,
+and relevant policy restrictions in the pull request instead of skipping the test.
 
 Do not bypass tests or edit generated package output while troubleshooting. Return to the
 [development commands](#development) after correcting the environment.
@@ -108,7 +96,7 @@ Pull requests should:
 - link the issue they resolve
 - describe public behavior and compatibility impact
 - include success, failure, boundary, and safe-error coverage where applicable
-- update package docs and examples with behavior changes
+- update package docs and synthetic fixtures with behavior changes
 - keep fixtures synthetic and package contents safe
 - avoid unrelated cleanup
 
@@ -124,18 +112,18 @@ identified.
 
 Every contract change needs:
 
-- a dated API-version decision
+- a dated wire-version decision
 - matching type, validator, fixture, and documentation updates
-- tests for invalid input, malformed responses, retries, and secret-safe errors
-- synchronized SDK, CLI, MCP, skill, example, and documentation changes where applicable
+- tests for invalid input, prohibited privacy fields, provenance, and secret-safe errors
+- synchronized SDK, adapter, schema, fixture, and documentation changes where applicable
 - a package-content review
 
 ## Public boundary
 
-Do not add routing, prompt, memory, evaluation, handoff, workflow execution, approval resumption, or
-orchestration claims before matching public server endpoints exist. Never include customer content,
-credentials, production identifiers, internal runbooks, deployment configuration, or private
-strategy in issues, fixtures, errors, logs, or package files.
+Do not add a hosted API client, credential storage, raw-content transport, case-review workflow,
+automated enforcement, or another public package without an accepted maintainer proposal. Never
+include customer content, credentials, production identifiers, internal runbooks, deployment
+configuration, or private strategy in issues, fixtures, errors, logs, or package files.
 
 Contributions are accepted under the repository's Apache-2.0 license. By contributing, you certify
 every commit under the [Developer Certificate of Origin 1.1](DCO). Each commit must contain a
