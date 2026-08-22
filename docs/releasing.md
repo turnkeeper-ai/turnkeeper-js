@@ -1,15 +1,15 @@
 # Releasing the public packages
 
-Turnkeeper publishes `@turnkeeper/sdk`, `@turnkeeper/cli`, `@turnkeeper/mcp`, and
-`@turnkeeper/adapter-sentinel` as one fixed prerelease group while their contracts are in alpha.
-Releases run only from annotated tags whose commits are already reachable from `origin/main`.
+Turnkeeper publishes `@turnkeeper/sdk` and `@turnkeeper/adapter-sentinel` as one fixed prerelease
+group while their contracts are in alpha. Releases run only from annotated tags whose commits are
+already reachable from `origin/main`.
 
 ## Release contract
 
-1. Update the root and all four package versions together.
-2. Pin the CLI dependency on the SDK, and both MCP dependencies, to that exact version.
-   `@turnkeeper/adapter-sentinel` stays zero-dependency.
-3. Update the changelog, examples, docs, MCP metadata, scaffolds, and agent-builder skill.
+1. Update the root and both package versions together.
+2. Keep both retained packages zero-dependency.
+3. Update the changelog, schemas, synthetic fixtures, package docs, protocol docs, and release
+   metadata together.
 4. Run `npm run check` with Node 22 and Node 24.
 5. Merge the release commit through protected `main`.
 6. Create and push the matching annotated `v<version>` tag from that merged commit.
@@ -18,18 +18,16 @@ The tag starts `.github/workflows/release.yml`. The workflow:
 
 - verifies that the tag is annotated, matches every package manifest, and points to a commit on
   `origin/main`;
-- verifies the exact SDK, CLI, and MCP dependency graph before running the complete repository
-  check with Node 24.18.0 and npm 11.6.2;
+- verifies the retained package manifests and zero-dependency boundaries before running the
+  complete repository check with Node 24.18.0 and npm 11.6.2;
 - creates the package tarballs once, then collects the versioned public JSON Schemas and generates
   CycloneDX SBOMs and SHA-256 checksums;
-- publishes those exact tarballs in SDK, CLI, MCP, then adapter-sentinel order through npm trusted
-  publishing;
+- publishes those exact SDK and adapter tarballs through npm trusted publishing;
 - safely resumes after a partial publish only when the registry artifact has the same SHA-512
   integrity as the local tarball;
 - allows up to 15 minutes for each registry write to become readable;
-- installs all four exact versions into a clean temporary project and verifies SDK import,
-  adapter-sentinel import, CLI execution, MCP stdio startup, npm signatures, SLSA provenance, and
-  the `next` dist-tag;
+- installs both exact versions into a clean temporary project and verifies the SDK, adapter,
+  npm signatures, SLSA provenance, and the `next` dist-tag;
 - attaches the identical tarballs, versioned schemas, SBOMs, and checksums to a GitHub prerelease.
 - creates or refreshes one unpublished changelog draft through the hosted platform only after all
   package, provenance, consumer, and GitHub prerelease checks succeed.
@@ -51,11 +49,9 @@ For each npm package, configure a GitHub Actions trusted publisher with these ex
 | Workflow filename | `release.yml` |
 | Environment | `npm-release` |
 
-Configure trusted publishing for all four packages:
+Configure trusted publishing for both packages:
 
 - `@turnkeeper/sdk`
-- `@turnkeeper/cli`
-- `@turnkeeper/mcp`
 - `@turnkeeper/adapter-sentinel`
 
 ### Adding a new package to the release group (bootstrap)
@@ -142,13 +138,9 @@ After the workflow succeeds, verify the registry and release from a clean machin
 directory:
 
 ```sh
-version="0.1.0-alpha.7"
+version="0.2.0-alpha.0"
 
 npm view "@turnkeeper/sdk@${version}" version dist.integrity \
-  dist.attestations.provenance.predicateType
-npm view "@turnkeeper/cli@${version}" version dist.integrity \
-  dist.attestations.provenance.predicateType
-npm view "@turnkeeper/mcp@${version}" version dist.integrity \
   dist.attestations.provenance.predicateType
 npm view "@turnkeeper/adapter-sentinel@${version}" version dist.integrity \
   dist.attestations.provenance.predicateType
@@ -158,15 +150,14 @@ cd "${consumer}"
 npm init --yes
 npm install --ignore-scripts \
   "@turnkeeper/sdk@${version}" \
-  "@turnkeeper/cli@${version}" \
-  "@turnkeeper/mcp@${version}"
+  "@turnkeeper/adapter-sentinel@${version}"
 node --input-type=module -e 'await import("@turnkeeper/sdk")'
-./node_modules/.bin/turnkeeper --help
+node --input-type=module -e 'await import("@turnkeeper/adapter-sentinel")'
 npm audit signatures
 ```
 
-The GitHub release must be marked as a prerelease and contain the three `.tgz` files, three SBOMs,
-the three versioned JSON Schemas, and `SHA256SUMS`. Each package's `next` dist-tag must equal the
+The GitHub release must be marked as a prerelease and contain the two `.tgz` files, two SBOMs,
+the versioned safety-exchange JSON Schema, and `SHA256SUMS`. Each package's `next` dist-tag must equal the
 released version. The workflow must also report that it created or updated the matching hosted
 changelog draft. An authenticated Turnkeeper operator reviews and publishes that draft separately.
 

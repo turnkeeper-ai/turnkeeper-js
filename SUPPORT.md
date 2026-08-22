@@ -8,7 +8,7 @@ best-effort basis, and response times are not guaranteed.
 - Use [GitHub Discussions](https://github.com/turnkeeper-ai/turnkeeper-js/discussions) for setup,
   usage, design questions, and integration guidance.
 - Use [GitHub Issues](https://github.com/turnkeeper-ai/turnkeeper-js/issues/new/choose) for
-  reproducible SDK, CLI, MCP, skill, example, and documentation defects.
+  reproducible Ward SDK, adapter, schema, fixture, and documentation defects.
 - Send suspected vulnerabilities privately to `support@turnkeeper.ai` as described in
   [SECURITY.md](SECURITY.md).
 - Send hosted dashboard, organization, billing, cloud storage, and production infrastructure

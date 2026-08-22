@@ -1,8 +1,8 @@
 {
   "name": "turnkeeper-sdk-monorepo",
-  "version": "0.1.0-alpha.7",
+  "version": "0.2.0-alpha.0",
   "private": true,
-  "description": "Public Turnkeeper SDK, CLI, MCP server, agent-builder skill, and examples.",
+  "description": "Public Turnkeeper Ward safety-intelligence contracts and detector adapters.",
   "license": "Apache-2.0",
   "type": "module",
   "packageManager": "npm@11.6.2",
@@ -10,20 +10,20 @@
     "node": ">=22.20.0 <23 || >=24.0.0 <25"
   },
   "workspaces": [
-    "packages/*",
-    "examples/*"
+    "packages/*"
   ],
   "scripts": {
     "audit:dependencies": "npm audit --omit=dev --audit-level=high",
     "build": "npm run build --workspace @turnkeeper/sdk && npm run build --workspaces --if-present",
-    "check": "npm run check:repository-boundary && npm run build && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present && npm run test:release-tools && npm run package:check --workspaces --if-present && npm run smoke:packages && node scripts/validate-skill.mjs",
+    "check": "npm run check:repository-boundary && npm run build && npm run typecheck --workspaces --if-present && npm run test --workspaces --if-present && npm run test:release-tools && npm run package:check --workspaces --if-present && npm run smoke:packages && npm run validate:public-surface",
     "check:repository-boundary": "node scripts/check-public-repository-boundary.mjs",
     "package:check": "npm run package:check --workspaces --if-present",
     "smoke:packages": "node scripts/smoke-packages.mjs",
     "smoke:macos-consumer": "node scripts/smoke-macos-consumer.mjs",
     "test": "npm run test --workspaces --if-present && npm run test:release-tools",
     "test:release-tools": "node --test scripts/*.test.mjs",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "validate:public-surface": "node scripts/validate-public-surface.mjs"
   },
   "devDependencies": {
     "@types/node": "22.19.9",

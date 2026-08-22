@@ -6,8 +6,8 @@ import { findPublicRepositoryBoundaryViolations } from "./check-public-repositor
 test("accepts public developer documentation", () => {
   const violations = findPublicRepositoryBoundaryViolations([
     {
-      path: "docs/replay.md",
-      content: "# Replay\n\nPublic metadata-only SDK behavior.",
+      path: "docs/safety-exchange.md",
+      content: "# Safety exchange\n\nPublic privacy-minimized contract behavior.",
     },
   ]);
 

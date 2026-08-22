@@ -1,11 +1,8 @@
 # Agent instructions
 
-Use [skills/turnkeeper-agent-builder/SKILL.md](skills/turnkeeper-agent-builder/SKILL.md) whenever a
-task adds, migrates, reviews, or tests Turnkeeper governance in an AI-agent workflow.
-
-Keep public developer tooling in this repository. Do not add hosted dashboard, organization,
-approval-storage, billing, database, migration, infrastructure, or production-operations
-implementation.
+Keep public Ward contracts, validators, conformance fixtures, detector adapters, and developer
+documentation in this repository. Do not add hosted dashboard, organization, case-review storage,
+billing, database, migration, infrastructure, or production-operations implementation.
 
 Do not add internal business documents such as strategy, fundraising, investor, founder-operations,
 prospecting, pipeline, outreach, unpublished marketing, or private partner materials.

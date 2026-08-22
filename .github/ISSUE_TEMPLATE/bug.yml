@@ -14,10 +14,8 @@ body:
       label: Affected surface
       options:
         - SDK
-        - CLI
-        - MCP
-        - Agent-builder skill
-        - Example
+        - Detector adapter
+        - Safety-exchange schema or fixture
         - Documentation
         - Release tooling
     validations:
@@ -59,7 +57,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      placeholder: "Node.js, npm, operating system, framework, and MCP client when relevant"
+      placeholder: "Node.js, npm, operating system, and integration runtime when relevant"
     validations:
       required: true
   - type: checkboxes

@@ -6,7 +6,7 @@ commitment.
 
 ## Scope
 
-This repository governs the public SDK, CLI, MCP server, agent-builder skill, synthetic examples,
+This repository governs the public Ward SDK, claim-safe detector adapter, synthetic fixtures,
 public specifications, and their documentation. Hosted application code, customer operations,
 deployment configuration, billing, cloud persistence, and private strategy are out of scope.
 
@@ -15,8 +15,8 @@ deployment configuration, billing, cloud persistence, and private strategy are o
 - Reproducible bug fixes and bounded documentation improvements may proceed from accepted issues.
 - New commands, tools, exports, schemas, compatibility changes, and package dependencies require an
   accepted feature proposal before implementation.
-- Public contracts must be supported by implemented server behavior. A roadmap idea is not a shipped
-  API.
+- Public contracts must preserve the privacy, provenance, purpose, expiry, revocation, and advisory
+  boundaries documented by the protocol.
 - Maintainers may decline changes that weaken privacy, deterministic behavior, secret safety,
   compatibility, package boundaries, or long-term maintenance capacity.
 

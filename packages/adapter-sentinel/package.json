@@ -1,6 +1,6 @@
 {
   "name": "@turnkeeper/adapter-sentinel",
-  "version": "0.1.0-alpha.7",
+  "version": "0.2.0-alpha.0",
   "description": "Claim-safe mapper from Sentinel-like window candidates to Turnkeeper DetectorCandidate metadata.",
   "license": "Apache-2.0",
   "type": "module",

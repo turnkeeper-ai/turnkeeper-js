@@ -1,23 +1,16 @@
 # Public roadmap
 
-This roadmap covers the public Turnkeeper SDK, CLI, MCP server, agent-builder skill, synthetic
-examples, specifications, and documentation. It is directional, not a release-date commitment.
+This roadmap covers the public Turnkeeper Ward contract SDK, claim-safe detector adapter, synthetic
+fixtures, specifications, and documentation. It is directional, not a release-date commitment.
 Actionable work is tracked in GitHub issues and milestones.
 
 ## Implemented
 
-- TypeScript SDK clients for metadata-only Replay and bounded Control checks
-- CLI scaffolding, policy validation, test generation, and integration inspection
-- Development-time MCP tools
-- Turnkeeper agent-builder skill
-- Synthetic governed-agent examples and durable outbox guidance, including bounded Control contract
-  examples for [`support.refund`](examples/financial-services-refund),
-  [`support.escalation`](examples/support-escalation), and
-  [`account.contact_information.change`](examples/account-contact-change)
-- Alpha package release and verification automation
 - Versioned Ward exchange envelopes, revocation, private-match contracts, and validators for
   synthetic privacy-minimized collaboration. See the
   [Safety Exchange Protocol v0.1 working draft](docs/safety-exchange-protocol-v0.1.md).
+- Claim-safe mapping for customer-hosted Sentinel-like detector candidates.
+- Alpha package release and verification automation for the SDK and detector adapter.
 - Additive v0.1 working profiles for cryptography, private matching, delivery, governance, threat
   modeling, and conformance, plus a machine-readable schema suite and negative fixtures. These are
   implementation requirements, not evidence of a live exchange or operational certification.
@@ -26,22 +19,14 @@ Actionable work is tracked in GitHub issues and milestones.
 
 - Tighten documentation around errors, retries, compatibility, and supported boundaries.
 - Improve diagnostics without exposing secrets or customer data.
-- Add focused framework examples that keep credentials server-side.
 - Expand cross-platform and package smoke coverage.
 - Resolve defects found by alpha adopters without widening public contracts casually.
 
-## Next: v0.2 developer experience
-
-- Improve CLI and MCP setup feedback based on documented contributor and adopter friction.
-- Add safe integration patterns where the current SDK contract already supports them.
-- Reduce time from installation to a validated metadata-only Replay or bounded Control integration.
-- Improve contributor tooling and documentation quality checks.
-
 ## Later
 
-Additional language SDKs and broader tooling are considered only after the public contracts are
-stable and sustained user evidence justifies their maintenance cost. Later items are not ready for
-implementation unless a maintainer opens or accepts a scoped issue.
+Additional language SDKs, a Ward-specific CLI, and a Ward-specific MCP server are considered only
+after the public contract is stable and sustained design-partner demand justifies their maintenance
+cost. They are not current public tooling commitments.
 
 Live multi-company case rooms, governed membership, provider feeds, and an industry conformance
 program also remain later roadmap work. The public exchange contracts do not imply a live network,
@@ -49,10 +34,10 @@ an adopted standard, or an official partner relationship.
 
 ## Out of scope
 
-This public roadmap does not include hosted dashboards, organization management, approval storage,
-billing, production infrastructure, or private application implementation. It also does not promise
-general routing, prompt management, memory, evaluation, handoff, workflow execution, approval
-resumption, or orchestration APIs before matching public server behavior exists.
+This public roadmap does not include hosted dashboards, organization management, review storage,
+authorization, billing, production infrastructure, or private application implementation. It also
+does not promise raw-content transport, automatic enforcement, general routing, prompt management,
+memory, evaluation, handoff, or workflow-execution APIs.
 
 ## Find work
 

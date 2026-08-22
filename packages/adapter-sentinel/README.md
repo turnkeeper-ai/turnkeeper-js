@@ -28,7 +28,7 @@ cross-tenant child-safety signal database.
 Pre-release — pin an exact version (do not rely on unversioned `latest` until promoted):
 
 ```bash
-npm install @turnkeeper/adapter-sentinel@0.1.0-alpha.7
+npm install @turnkeeper/adapter-sentinel@0.2.0-alpha.0
 ```
 
 ## Usage

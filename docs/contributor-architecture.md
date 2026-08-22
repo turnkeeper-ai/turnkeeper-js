@@ -1,9 +1,9 @@
 # Contributor architecture map
 
-This repository owns Turnkeeper's public TypeScript SDK, CLI, MCP server, agent-builder skill,
-synthetic examples, dated public specifications, and their documentation. It does not contain the
-hosted application, production API implementation, customer operations, deployment configuration,
-or private product strategy.
+This repository owns Turnkeeper's public Ward contract SDK, claim-safe detector adapter, dated
+public specifications, synthetic fixtures, and their documentation. It does not contain the hosted
+application, production API implementation, customer operations, deployment configuration, or
+private product strategy.
 
 ## Dependency direction
 
@@ -14,29 +14,23 @@ dated schemas in spec/
         |
         v
 packages/sdk
-   |         \
-   v          v
-packages/cli  synthetic examples
    |
    v
-packages/mcp
+packages/adapter-sentinel
 
-skills/ and docs/ describe these shipped public surfaces; they are not runtime dependencies.
+docs/ and synthetic fixtures describe these shipped public surfaces; they are not runtime dependencies.
 ```
 
-The SDK owns transport, validation, and public client types. The CLI consumes the exact SDK release
-when it scaffolds integrations. The MCP package consumes the CLI and SDK to expose bounded,
-development-time tools. Examples depend on the SDK and use synthetic data only.
+The SDK owns public contract types and validators. The detector adapter maps customer-hosted,
+bounded candidates into that privacy-minimized shape. Documentation and fixtures describe behavior
+with synthetic data only.
 
 ## Where changes belong
 
 | Surface | Primary source | Tests and synthetic fixtures | Package or boundary check |
 | --- | --- | --- | --- |
-| SDK | `packages/sdk/src/` | `packages/sdk/test/` | `packages/sdk/scripts/check-package-contents.mjs` |
-| CLI | `packages/cli/src/` | `packages/cli/test/` | `packages/cli/scripts/check-package-contents.mjs` |
-| MCP | `packages/mcp/src/` | `packages/mcp/test/` | `packages/mcp/scripts/check-package-contents.mjs` |
-| Agent-builder skill | `skills/turnkeeper-agent-builder/` | examples and reference snippets under the skill | `scripts/validate-skill.mjs` |
-| Examples | `examples/*/src/` | `examples/*/test/` | root workspace tests and package smoke checks |
+| Ward SDK | `packages/sdk/src/` | `packages/sdk/test/` | `packages/sdk/scripts/check-package-contents.mjs` |
+| Detector adapter | `packages/adapter-sentinel/src/` | `packages/adapter-sentinel/test/` | `packages/adapter-sentinel/scripts/check-package-contents.mjs` |
 | Public contracts | `spec/` and SDK validators/types | SDK schema and contract tests | release artifact checks in `.github/workflows/release.yml` |
 | Documentation | `README.md`, package READMEs, and `docs/` | executable examples where declared | root documentation and repository checks |
 
@@ -57,17 +51,15 @@ published capability until its versioned packages and release artifacts are avai
 
 - SDK behavior: update SDK source, tests, package README, public docs, and changelog.
 - Wire shape: also update the dated schema, schema tests, release artifacts, and API-version notes.
-- CLI scaffold or generated command: update CLI source, scaffold tests, exact SDK version, and
-  affected examples.
-- MCP setup or tool behavior: update MCP source, tests, package README, `docs/mcp.md`, and skill
-  references when they expose the same workflow.
-- Synchronized prerelease: update every workspace package, exact internal dependency, generated
-  scaffold version, user-agent/version constant, skill command, example, and lockfile.
+- Detector adapter mapping: update adapter source, tests, package README, and its source-detector
+  boundary claim.
+- Synchronized prerelease: update the retained workspace packages, shared contract version,
+  documentation, release metadata, and lockfile.
 - Privacy or safety boundary: update `docs/privacy.md`, the nearest validator, negative tests, and
   package-content checks.
 
-Run `npm run check` after any cross-surface change. The release validator intentionally fails when
-package versions, public contracts, skills, or repository boundaries drift.
+Run `npm run check` after any cross-surface change. The public-surface validator intentionally
+fails when package versions, public contracts, or repository boundaries drift.
 
 ## Status and boundaries
 
